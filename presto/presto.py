@@ -18,7 +18,7 @@ class Presto(AbstractRequest):
     Request: Type[PrestoRequest] = PrestoRequest
     Response: Type[PrestoResponse] = PrestoResponse
 
-    APPEND_SLASH = True
+    APPEND_SLASH = False
 
     __url__: str = None
 
