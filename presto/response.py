@@ -9,11 +9,11 @@ __all__ = "Response",
 
 
 class Response(AttrCopyable, requests.Response):
-    __state_attrs__ = requests.Response.__attrs__
+    __state_attrs__ = requests.Response.__attrs__ + ["dict"]
 
     def __init__(self, response: requests.Response):
         self.__dict__ = response.__dict__
         self.raise_for_status()
 
-        if self.headers.get("content-type") == "application/json":
-            self.json = adict(self.json())
+        if self.headers.get("content-type").startswith("application/json"):
+            self.dict = adict(self.json())
