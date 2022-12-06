@@ -91,12 +91,6 @@ class _Request(__Request):
     def __init__(self, parent: __Request, path: str):
         super().__init__(parent)
 
-        if not isinstance(self.__parent__, _Request):
-            if not path.startswith("/"):
-                path = "/" + path
-        elif path.startswith("/"):
-            path = path[1:]
-
         if self.__handler__.APPEND_SLASH and not path.endswith("/"):
             path += "/"
 
