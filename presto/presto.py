@@ -37,8 +37,10 @@ class Presto(AbstractRequest):
             Handler: Type[PrestoHandler] = Handler,
             Request: Type[PrestoRequest] = Request,
             Response: Type[PrestoRequest] = Response,
+            APPEND_SLASH: bool = APPEND_SLASH,
             **kwds
     ):
+        self.APPEND_SLASH = APPEND_SLASH
         self.__handler__ = Handler(
             presto=self, Request=Request, Response=Response
         )
