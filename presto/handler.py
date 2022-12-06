@@ -13,40 +13,29 @@ __all__ = "_Handler",
 PrestoT = TypeVar("PrestoT", bound="Presto")
 
 
+# noinspection PyPep8Naming
 class _Handler(Generic[PrestoT]):
-    """Base request handler.
-
-    Contract in order to prevent circular structure:
-        This class carries no state from the Presto instance passed to __init__.
-        (That lambda doesn't count :)
-    """
+    """Base request handler."""
 
     APPEND_SLASH: bool
 
-    _Presto: Type[PrestoT]
+    _presto: PrestoT
 
     Request: Type[_Request[_Handler[PrestoT]]]
     Response: Type[_Response]
 
-    __session: requests.Session
+    _session: requests.Session
 
-    # noinspection PyPep8Naming,PyShadowingNames
     def __init__(
             self,
             presto: PrestoT,
-            Request: Type[_Request[_Handler[PrestoT]]] = _Request,
-            Response: Type[_Response] = _Response,
     ):
-        # noinspection PyTypeChecker
-        self.APPEND_SLASH = property(lambda self: presto.APPEND_SLASH)
-        self._Presto = type(presto)
-        self.__session = requests.Session()
-        self.Request = Request
-        self.Response = Response
+        self._presto = presto
+        self._session = requests.Session()
 
     def __call__(self, request: _Request[_Handler[PrestoT]], **kwds) -> _Response:
-        if not isinstance(request, self.Request) and not isinstance(request, self._Presto):
-            raise TypeError(f"request must be of type {self.Request.__name__} or {self._Presto.__name__}")
+        if not isinstance(request, self.Request) and not isinstance(request, type(self._presto)):
+            raise TypeError(f"request must be of type {self.Request.__name__} or {self._presto.__name__}")
 
         req = adict(request.__request__)
         req.merge(kwds)
@@ -55,5 +44,23 @@ class _Handler(Generic[PrestoT]):
         return self.Response(self.session.request(**req))
 
     @property
+    def APPEND_SLASH(self):
+        return self._presto.APPEND_SLASH
+
+    @property
+    def Request(self) -> Type[_Request[_Handler[PrestoT]]]:
+        return self._presto.Request
+
+    @property
+    def Response(self) -> Type[_Response]:
+        return self._presto.Response
+
+    @property
     def session(self):
-        return self.__session
+        return self._session
+
+    def copy(self, to_presto: PrestoT, deep: bool = False) -> _Handler[PrestoT]:
+        this = self.__class__.__new__(self.__class__)
+        this._presto = to_presto
+        this._session = self._session if not deep else requests.Session()
+        return this

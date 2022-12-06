@@ -46,7 +46,7 @@ class __Request(Generic[HandlerT], ABC):
             if request.__parent__ is not self.__parent__:
                 raise AttributeError(f"Request '{name}' has a different parent from this request.")
 
-            req = request.copy()
+            req = request.__copy__()
             req.__parent__ = self
             request = self.__requests__[name] = req
 
@@ -74,7 +74,7 @@ class __Request(Generic[HandlerT], ABC):
     # def __url__(self) -> str:
     #     raise NotImplementedError
 
-    def copy(self) -> Self:
+    def __copy__(self) -> Self:
         this = self.__class__.__new__(self.__class__)
         # this.__url__ = self.__url__  # (Skip "fake abstract" property)
         this.__handler__ = self.__handler__
@@ -121,7 +121,7 @@ class _Request(__Request):
     def __url__(self):
         return urljoin(self.__parent__.__url__ + "/", self.__path__)
 
-    def copy(self) -> Self:
-        this = super().copy()
+    def __copy__(self) -> Self:
+        this = super().__copy__()
         this.__path__ = self.__path__
         return this

@@ -14,9 +14,9 @@ __all__ = "Presto",
 # noinspection PyPep8Naming
 class Presto(__Request):
 
-    Handler: Type[_Handler[Presto]]
-    Request: Type[_Request[_Handler[Presto]]]
-    Response: Type[_Response]
+    Handler: Type[_Handler[Presto]] = _Handler
+    Request: Type[_Request[_Handler[Presto]]] = _Request
+    Response: Type[_Response] = _Response
 
     APPEND_SLASH: bool = False
 
@@ -40,23 +40,15 @@ class Presto(__Request):
             **kwds
     ):
         self.Handler = Handler
+        self.Request = Request
+        self.Response = Response
         self.APPEND_SLASH = APPEND_SLASH
-        self.__handler__ = Handler(
-            presto=self, Request=Request, Response=Response
-        )
+        self.__handler__ = Handler(presto=self)
         self.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
         super().__init__(self, **kwds)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(url={self.__url__!r}, params={self.__params__!r})"
-
-    @property
-    def Request(self) -> Type[_Request[_Handler[Presto]]]:
-        return self.__handler__.Request
-
-    @property
-    def Response(self) -> Type[_Response]:
-        return self.__handler__.Response
 
     @property
     def request(self):
@@ -66,7 +58,7 @@ class Presto(__Request):
 
     def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Self, Response]:
         if url is not None:
-            presto = self.copy()
+            presto = self.__copy__()
             presto.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
             return presto.__call__(**kwds)
 
@@ -80,11 +72,12 @@ class Presto(__Request):
     options = property(lambda self: self.request(method="OPTIONS"))
     head = property(lambda self: self.request(method="HEAD"))
 
-    def copy(self) -> Self:
-        this = super().copy()
+    def __copy__(self) -> Self:
+        this = super().__copy__()
         this.Handler = self.Handler
         this.Request = self.Request
         this.Response = self.Response
         this.APPEND_SLASH = self.APPEND_SLASH
+        this.__handler__ = self.__handler__.copy(this)
         this.__url__ = self.__url__
         return this
