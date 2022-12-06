@@ -2,13 +2,27 @@
 
 An object-oriented REST API client & requests extesion library.
 
-Example:
+## Installation
+
+```bash
+pip install presto-requests
+```
+```bash
+poetry add presto-requests
+```
+
+### Concept:
+
+Presto! Requests is a library that extends the functionality of the requests library.
+It provides a simple way to create a REST API client that is object-oriented and easy to use.
+
+### Example:
 
 ```python
 from pprint import pprint
 from presto import Presto
 
-presto = Presto('https://api.github.com')
+presto = Presto("https://api.github.com")
 
 user = presto.users.sitbon()  # == presto.users["sitbon"]()
 
@@ -52,3 +66,58 @@ User sitbon has 15 public repositories.
  'url': 'https://api.github.com/users/sitbon'}
 
 ```
+
+### Usage:
+
+Each dot in the path of the request is a new request object.
+
+Calling the object without any arguments will execute the request and return the response object.
+
+Specifying keyword arguments will add them to the request as keyword arguments to requests.request(),
+and then return the current object for further chaining.
+
+There are a few special top-level attributes that can be used to modify the request:
+`get`, `post`, `put`, `patch`, `delete`, `head`, `options`, and finally `request` which is
+an empty path component that can be used to indirectly modify existing top-level auto created request objects.
+
+All of these top-level attributes are able to clone existing request attributes, to modify the path
+and parent parameters while using the same component path and parameters.
+
+For example:
+
+```python
+from presto import Presto
+
+presto = Presto("http://127.0.0.1:8000", APPEND_SLASH=True)
+
+api = presto.api
+
+print("api:", api)
+print("presto.request.api:", presto.request.api)
+print("equal:", presto.request.api == api)
+
+api(headers={"X-User": "Testing"})(allow_redirects=False)
+
+print("api(...):", api)
+
+resp = api.note[4]()
+
+print("req headers:", resp.request.headers)
+print("resp:", resp)
+print("note:", resp.attr)
+```
+```output
+api: Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json'))).Request(path='/api/')
+presto.request.api: Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json'))).Request(path='/').Request(path='/api/')
+equal: True
+api(...): Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json'))).Request(path='/api/', params=adict(headers={'X-User': 'Testing'}, allow_redirects=False))
+req headers: {'User-Agent': 'python-requests/2.28.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'X-User': 'Testing'}
+resp: <Response [200]>
+note: adict(id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-26-02T19:26:09-0800', note='Hello from the API!!', collection='http://127.0.0.1:8000/api/coll/3/')
+```
+
+`response.attr` is an `adict` instance, which is a dictionary that can be accessed as attributes.
+It contains the JSON-decoded content of a response, if any.
+
+`APPEND_SLASH` is meant to be globally implementation-specific, e.g. for Django Rest Framework you would
+set `Presto.APPEND_SLASH = True` to append a trailing slash to all requests without specifying it every time.
