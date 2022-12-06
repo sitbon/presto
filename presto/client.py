@@ -2,7 +2,7 @@ from .presto import Presto
 
 
 class PrestoClient:
-    """Base class for Presto client API implementations."""
+    """Template class for Presto client API implementations."""
     _APPEND_SLASH: bool = False
     _presto: Presto
     _params: dict = dict(

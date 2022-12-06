@@ -4,7 +4,7 @@ from typing import Optional, Union, Type, Self
 
 from .handler import _Handler
 # noinspection PyProtectedMember
-from .request import __Request, _Request
+from .request import __Request__, _Request
 from .response import _Response
 from .adict import adict
 
@@ -12,7 +12,7 @@ __all__ = "Presto",
 
 
 # noinspection PyPep8Naming
-class Presto(__Request):
+class Presto(__Request__):
 
     Handler: Type[_Handler[Presto]] = _Handler
     Request: Type[_Request[_Handler[Presto]]] = _Request
@@ -46,9 +46,6 @@ class Presto(__Request):
         self.__handler__ = Handler(presto=self)
         self.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
         super().__init__(self, **kwds)
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}(url={self.__url__!r}, params={self.__params__!r})"
 
     @property
     def request(self):
