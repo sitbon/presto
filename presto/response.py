@@ -17,5 +17,5 @@ class _Response(requests.Response):
         self.__dict__ = response.__dict__
         self.raise_for_status()
 
-        if self.headers.get("content-type").startswith("application/json"):
+        if self.ok and self.headers.get("content-type").startswith("application/json"):
             self.attr = adict(self.json())

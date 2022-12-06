@@ -4,20 +4,21 @@ from typing import Optional, Union, Type, Self
 
 from .handler import _Handler
 # noinspection PyProtectedMember
-from .request import AbstractRequest, _Request
+from .request import __Request, _Request
 from .response import _Response
 from .adict import adict
 
 __all__ = "Presto",
 
 
-class Presto(AbstractRequest):
+# noinspection PyPep8Naming
+class Presto(__Request):
 
-    Handler: Type[_Handler] = _Handler
-    Request: Type[_Request] = _Request
-    Response: Type[_Response] = _Response
+    Handler: Type[_Handler[Presto]]
+    Request: Type[_Request[_Handler[Presto]]]
+    Response: Type[_Response]
 
-    APPEND_SLASH = False
+    APPEND_SLASH: bool = False
 
     __url__: str = None
 
@@ -28,20 +29,17 @@ class Presto(AbstractRequest):
         ),
     )
 
-    # noinspection PyPep8Naming,PyShadowingNames
     def __init__(
             self,
             url: str,
             *,
-            Handler: Type[_Handler] = Handler,
-            Request: Type[_Request] = Request,
-            Response: Type[_Response] = Response,
+            Handler: Type[_Handler[Presto]] = _Handler,
+            Request: Type[_Request[_Handler[Presto]]] = _Request,
+            Response: Type[_Response] = _Response,
             APPEND_SLASH: bool = APPEND_SLASH,
             **kwds
     ):
         self.Handler = Handler
-        self.Request = Request
-        self.Response = Response
         self.APPEND_SLASH = APPEND_SLASH
         self.__handler__ = Handler(
             presto=self, Request=Request, Response=Response
@@ -52,6 +50,20 @@ class Presto(AbstractRequest):
     def __repr__(self):
         return f"{self.__class__.__name__}(url={self.__url__!r}, params={self.__params__!r})"
 
+    @property
+    def Request(self) -> Type[_Request[_Handler[Presto]]]:
+        return self.__handler__.Request
+
+    @property
+    def Response(self) -> Type[_Response]:
+        return self.__handler__.Response
+
+    @property
+    def request(self):
+        request = self.__handler__.Request(self, "")
+        request.__requests__.update(self.__requests__)
+        return request
+
     def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Self, Response]:
         if url is not None:
             presto = self.copy()
@@ -59,12 +71,6 @@ class Presto(AbstractRequest):
             return presto.__call__(**kwds)
 
         return super().__call__(**kwds)
-
-    @property
-    def request(self):
-        request = self.__handler__.Request(self, "")
-        request.__requests__.update(self.__requests__)
-        return request
 
     get = property(lambda self: self.request(method="GET"))
     post = property(lambda self: self.request(method="POST"))

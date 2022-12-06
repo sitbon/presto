@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Union, Dict, Self, Any, TypeVar
+from abc import ABC
+from typing import Union, Dict, Self, Any, TypeVar, Generic
 
 from urllib.parse import urljoin
 
@@ -13,15 +13,15 @@ HandlerT = TypeVar("HandlerT", bound="_Handler")
 ResponseT = TypeVar("ResponseT", bound="_Response")
 
 
-class AbstractRequest(ABC):
+class __Request(Generic[HandlerT], ABC):
 
     __url__: str = None  # abstract
     __handler__: HandlerT
-    __parent__: AbstractRequest
+    __parent__: __Request[HandlerT]
     __params__: adict
-    __requests__: Dict[str, AbstractRequest]
+    __requests__: Dict[str, __Request[HandlerT]]
 
-    def __init__(self, parent: AbstractRequest, **kwds):
+    def __init__(self, parent: __Request[HandlerT], **kwds):
         self.__handler__ = parent.__handler__
         self.__parent__ = parent
         self.__params__ = self.__clean_params__(adict(getattr(self, "__params__", {})).merged(kwds))
@@ -34,9 +34,9 @@ class AbstractRequest(ABC):
 
         return params
 
-    def __getattr__(self, name: str) -> AbstractRequest:
+    def __getattr__(self, name: str) -> __Request[HandlerT]:
         if name.startswith("__") and name.endswith("__"):
-            raise AttributeError(name)  # Most likely an accidentally invalid internal attribute/method.
+            raise AttributeError(name)  # Most likely an accidentally invalid internal attribute/method access.
 
         request = self.__requests__.get(name)
 
@@ -84,20 +84,20 @@ class AbstractRequest(ABC):
         return this
 
 
-class _Request(AbstractRequest):
+class _Request(__Request):
 
     __path__: str
 
-    def __init__(self, parent: AbstractRequest, path: str):
+    def __init__(self, parent: __Request, path: str):
         super().__init__(parent)
 
-        if self.__parent__ is self.__handler__.presto:
+        if not isinstance(self.__parent__, _Request):
             if not path.startswith("/"):
                 path = "/" + path
         elif path.startswith("/"):
             path = path[1:]
 
-        if self.__handler__.presto.APPEND_SLASH and not path.endswith("/"):
+        if self.__handler__.APPEND_SLASH and not path.endswith("/"):
             path += "/"
 
         self.__path__ = path

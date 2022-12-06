@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Generic
 
 import requests
 
@@ -13,39 +13,46 @@ __all__ = "_Handler",
 PrestoT = TypeVar("PrestoT", bound="Presto")
 
 
-class _Handler:
+class _Handler(Generic[PrestoT]):
+    """Base request handler.
 
-    Request: Type[_Request]
+    Contract in order to prevent circular structure:
+        This class carries no state from the Presto instance passed to __init__.
+        (That lambda doesn't count :)
+    """
+
+    APPEND_SLASH: bool
+
+    _Presto: Type[PrestoT]
+
+    Request: Type[_Request[_Handler[PrestoT]]]
     Response: Type[_Response]
 
-    __presto: PrestoT
     __session: requests.Session
 
     # noinspection PyPep8Naming,PyShadowingNames
     def __init__(
             self,
             presto: PrestoT,
-            Request: Type[_Request],
-            Response: Type[_Response]
+            Request: Type[_Request[_Handler[PrestoT]]] = _Request,
+            Response: Type[_Response] = _Response,
     ):
-        self.__presto = presto
+        # noinspection PyTypeChecker
+        self.APPEND_SLASH = property(lambda self: presto.APPEND_SLASH)
+        self._Presto = type(presto)
         self.__session = requests.Session()
         self.Request = Request
         self.Response = Response
 
-    def __call__(self, request: _Request, **kwds) -> _Response:
-        if not isinstance(request, self.Request) and not isinstance(request, type(self.presto)):
-            raise TypeError(f"request must be of type {self.Request.__name__} or {type(self.presto).__name__}")
+    def __call__(self, request: _Request[_Handler[PrestoT]], **kwds) -> _Response:
+        if not isinstance(request, self.Request) and not isinstance(request, self._Presto):
+            raise TypeError(f"request must be of type {self.Request.__name__} or {self._Presto.__name__}")
 
         req = adict(request.__request__)
         req.merge(kwds)
         req.url = request.__url__
 
         return self.Response(self.session.request(**req))
-
-    @property
-    def presto(self):
-        return self.__presto
 
     @property
     def session(self):
