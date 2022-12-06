@@ -73,6 +73,9 @@ Each dot in the path of the request is a new request object.
 
 Calling the object without any arguments will execute the request and return the response object.
 
+Indexing the object like a list is a convient way to extend the path to a new object for things
+like id paths, e.g. `presto.note[1]()`.
+
 Specifying keyword arguments will add them to the request as keyword arguments to requests.request(),
 and then return the current object for further chaining.
 
@@ -94,7 +97,6 @@ api = presto.api
 
 print("api:", api)
 print("presto.request.api:", presto.request.api)
-print("equal:", presto.request.api == api)
 
 api(headers={"X-User": "Testing"})(allow_redirects=False)
 
@@ -109,15 +111,14 @@ print("note:", resp.attr)
 ```output
 api: Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json'))).Request(path='/api/')
 presto.request.api: Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json'))).Request(path='/').Request(path='/api/')
-equal: True
 api(...): Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json'))).Request(path='/api/', params=adict(headers={'X-User': 'Testing'}, allow_redirects=False))
 req headers: {'User-Agent': 'python-requests/2.28.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'X-User': 'Testing'}
 resp: <Response [200]>
-note: adict(id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-26-02T19:26:09-0800', note='Hello from the API!!', collection='http://127.0.0.1:8000/api/coll/3/')
+note: adict(id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection='http://127.0.0.1:8000/api/coll/3/')
 ```
 
 `response.attr` is an `adict` instance, which is a dictionary that can be accessed as attributes.
 It contains the JSON-decoded content of a response, if any.
 
-`APPEND_SLASH` is meant to be globally implementation-specific, e.g. for Django Rest Framework you would
-set `Presto.APPEND_SLASH = True` to append a trailing slash to all requests without specifying it every time.
+`APPEND_SLASH` is meant to be client implementation-specific, e.g. for a Django Rest Framework client, one would
+typically set `Presto.APPEND_SLASH = True` or inherit from `Presto` in a pre-defined API client class.
