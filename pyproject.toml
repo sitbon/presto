@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "presto-requests"
-version = "0.3.6"
+version = "0.3.7"
 description = ""
 authors = ["Phillip Sitbon <phillip.sitbon@gmail.com>"]
 readme = "README.md"

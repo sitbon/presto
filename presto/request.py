@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Union, Dict, Self, Any, TypeVar, Generic
+from typing import Union, Dict, Self, Any, TypeVar, Generic, Optional
 
+from copy import copy, deepcopy
 from urllib.parse import urljoin
 
 from .adict import adict
@@ -60,10 +61,7 @@ class __Request__(Generic[HandlerT], ABC):
         if request is None:
             request = self.__requests__[name] = self.__handler__.Request(self, name)
         elif request.__parent__ is not self:
-            if request.__parent__ is not self.__parent__:
-                raise AttributeError(f"Request '{name}' has a different parent from this request.")
-
-            req = request.__copy__()
+            req = copy(request)
             req.__parent__ = self
             request = self.__requests__[name] = req
 
@@ -86,18 +84,23 @@ class __Request__(Generic[HandlerT], ABC):
 
         return self.__parent__.__request__.merged(self.__params__)
 
-    # @property
-    # @abstractmethod
-    # def __url__(self) -> str:
-    #     raise NotImplementedError
-
     def __copy__(self) -> Self:
         this = self.__class__.__new__(self.__class__)
         # this.__url__ = self.__url__  # (Skip "fake abstract" property)
-        this.__handler__ = self.__handler__
+        this.__handler__ = copy(self.__handler__)
         this.__parent__ = self.__parent__
         this.__params__ = self.__params__
         this.__requests__ = self.__requests__
+        return this
+
+    def __deepcopy__(self, memo: dict) -> Self:
+        this = self.__class__.__new__(self.__class__)
+        memo[id(self)] = this
+        this.__url__ = self.__url__
+        this.__handler__ = deepcopy(self.__handler__, memo)
+        this.__parent__ = deepcopy(self.__parent__, memo)
+        this.__params__ = deepcopy(self.__params__, memo)
+        this.__requests__ = deepcopy(self.__requests__, memo)
         return this
 
     def __eq__(self, other) -> bool:
@@ -132,5 +135,10 @@ class _Request(__Request__):
 
     def __copy__(self) -> Self:
         this = super().__copy__()
+        this.__path__ = self.__path__
+        return this
+
+    def __deepcopy__(self, memo: dict) -> Self:
+        this = super().__deepcopy__(memo)
         this.__path__ = self.__path__
         return this

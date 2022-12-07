@@ -114,7 +114,7 @@ presto.request.api: Request(url='http://127.0.0.1:8000/api/', params=adict(metho
 api(...): Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json', X-User='Testing'), allow_redirects=False))
 req headers: {'User-Agent': 'python-requests/2.28.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'X-User': 'Testing'}
 resp: <Response [200]>
-note: adict(id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection='http://127.0.0.1:8000/api/coll/3/')
+note: adict(id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection={'id': 3, 'url': 'http://127.0.0.1:8000/api/note/coll/3/', 'name': 'Public', 'public': True, 'notes': 1})
 ```
 
 `response.attr` is an `adict` instance, which is a dictionary that can be accessed as attributes.

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Type, TypeVar, Generic
+from typing import Type, TypeVar, Generic, Self, Optional
 
+from copy import deepcopy
 import requests
 
 from .request import _Request
@@ -59,8 +60,17 @@ class _Handler(Generic[PrestoT]):
     def session(self):
         return self._session
 
-    def copy(self, to_presto: PrestoT, deep: bool = False) -> _Handler[PrestoT]:
+    def __copy__(self) -> Self:
         this = self.__class__.__new__(self.__class__)
-        this._presto = to_presto
-        this._session = self._session if not deep else requests.Session()
+        this._presto = self._presto
+        this._session = self._session
+        return this
+
+    def __deepcopy__(self, memo: dict, to: Optional[PrestoT] = None) -> Self:
+        if id(self) in memo:
+            return memo[id(self)]  # For when Presto calls this directly.
+        this = self.__class__.__new__(self.__class__)
+        memo[id(self)] = this
+        this._presto = to or deepcopy(self._presto, memo)
+        this._session = requests.Session()
         return this
