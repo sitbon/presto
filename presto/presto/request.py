@@ -97,9 +97,13 @@ class __Request__(Generic[HandlerT], ABC):
     def __deepcopy__(self, memo: dict) -> Self:
         this = self.__class__.__new__(self.__class__)
         memo[id(self)] = this
-        this.__url__ = self.__url__
         this.__handler__ = deepcopy(self.__handler__, memo)
-        this.__parent__ = deepcopy(self.__parent__, memo)
+
+        if self.__parent__ is self:
+            this.__parent__ = this
+        else:
+            this.__parent__ = deepcopy(self.__parent__, memo)
+
         this.__params__ = deepcopy(self.__params__, memo)
         this.__requests__ = deepcopy(self.__requests__, memo)
         return this

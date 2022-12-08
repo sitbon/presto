@@ -1,34 +1,25 @@
-from presto.presto import Presto
+from .presto import AsyncPresto
 
-__all__ = "PrestoClient",
+from presto.presto.client import PrestoClient
+
+__all__ = "AsyncPrestoClient",
 
 
-class PrestoClient:
+class AsyncPrestoClient(PrestoClient):
     """Template class for Presto client API implementations."""
-    _APPEND_SLASH: bool = False
-    _presto: Presto
-    _params: dict = dict(
-        method="GET",
-        headers={
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        },
-    )
-
-    class Handler(Presto.Handler):
+    
+    class Handler(PrestoClient.Handler):
         """Placeholder for readability."""
-        pass
 
-    class Request(Presto.Request):
+    class Request(PrestoClient.Request):
         """Placeholder for readability."""
-        pass
 
-    class Response(Presto.Response):
+    class Response(PrestoClient.Response):
         """Placeholder for readability."""
-        pass
 
+    # noinspection PyMissingConstructor
     def __init__(self, url: str):
-        self._presto = Presto(
+        self._presto = AsyncPresto(
             url=url,
             Handler=self.Handler,
             Request=self.Request,

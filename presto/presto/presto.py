@@ -85,7 +85,7 @@ class Presto(__Request__):
 
     def __deepcopy__(self, memo: dict) -> Self:
         this = super().__deepcopy__(memo)
-        this.__handler__ = self.__handler__.__deepcopy__(memo, this)
+        this.__handler__._presto = this
         this.APPEND_SLASH = self.APPEND_SLASH
         this.__url__ = self.__url__
         this.Handler = deepcopy(self.Handler, memo)

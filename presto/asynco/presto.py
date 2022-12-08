@@ -1,39 +1,48 @@
 from __future__ import annotations
 
-from typing import Optional, Union, Self
+from typing import Optional, Union, Self, Type
 
 from copy import copy
 
-from presto import presto as _presto
+from presto.presto import Presto
 
-from .handler import Handler as _Handler
-from .request import Request as _Request
-from .response import Response as _Response
+from .handler import AsyncHandler as _AsyncHandler
+from .request import AsyncRequest as _AsyncRequest
+from .response import AsyncResponse as _AsyncResponse
 
-__all__ = "Presto",
+__all__ = "AsyncPresto",
 
 
-class Presto(_presto.Presto):
+# noinspection PyPep8Naming
+class AsyncPresto(Presto):
 
-    class Handler(_Handler):
+    class AsyncHandler(_AsyncHandler):
         pass
 
-    class Request(_Request):
+    class AsyncRequest(_AsyncRequest):
         pass
 
-    class Response(_Response):
+    class AsyncResponse(_AsyncResponse):
         pass
 
-    def __init__(self, url, **kwds):
+    def __init__(
+            self,
+            url: str,
+            *,
+            Handler: Type[AsyncHandler[Presto]] = AsyncHandler,
+            Request: Type[AsyncRequest[AsyncHandler[Presto]]] = AsyncRequest,
+            Response: Type[AsyncResponse] = AsyncResponse,
+            **kwds
+    ):
         super().__init__(
             url=url,
-            Handler=self.Handler,
-            Request=self.Request,
-            Response=self.Response,
+            Handler=Handler,
+            Request=Request,
+            Response=Response,
             **kwds
         )
 
-    async def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Self, Response]:
+    async def __call__(self, url: Optional[str] = None, **kwds) -> Union[AsyncPresto, Self, AsyncResponse]:
         if url is not None:
             presto = copy(self)
             presto.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")

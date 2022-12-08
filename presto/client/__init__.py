@@ -1,8 +1,8 @@
-from . import client as _client
+from presto.presto import Presto, PrestoClient
 
-__all__ = "PrestoClient",
+__all__ = "Presto", "PrestoClient", "AsyncPresto", "AsyncPrestoClient"
 
-
-# noinspection PyPep8Naming
-class PrestoClient(_client.PrestoClient):
-    pass
+try:
+    from presto.asynco import AsyncPresto, AsyncPrestoClient
+except ImportError:
+    AsyncPresto, AsyncPrestoClient = None, None

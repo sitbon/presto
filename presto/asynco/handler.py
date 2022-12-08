@@ -6,45 +6,44 @@ import httpx
 from presto.adict import adict
 from presto.presto import Presto
 
-from .response import Response
+from .response import AsyncResponse
 
-__all__ = "Handler",
-
-
-PrestoT = TypeVar("PrestoT", bound="Presto")
+__all__ = "AsyncHandler",
 
 
-class Handler(Presto.Handler):
+PrestoT = TypeVar("PrestoT", bound="AsyncPresto")
+
+
+class AsyncHandler(Presto.Handler):
+    _session: Optional
     _client: httpx.AsyncClient
 
     def __init__(
             self,
             presto: PrestoT,
     ):
-        self._presto = presto
+        super().__init__(presto)
+        self._session = None
         self._client = httpx.AsyncClient()
 
     async def __call__(self, request: Presto.Request, **kwds) -> Presto.Response:
+        request = deepcopy(request)
         url = request.__url__
         params = adict(request.__request__).__merge__(kwds)
         method = params.pop("method")
-        return Response(await self._client.request(method, url, **params))
+        return self.presto.Response(self, request, await self._client.request(method, url, **params))
 
     @property
     def client(self):
         return self._client
 
     def __copy__(self) -> Self:
-        this = self.__class__.__new__(self.__class__)
-        this._presto = self._presto
+        this = super().__copy__()
         this._client = self._client
         return this
 
-    def __deepcopy__(self, memo: dict, to: Optional[PrestoT] = None) -> Self:
-        if id(self) in memo:
-            return memo[id(self)]  # For when Presto calls this directly.
-        this = self.__class__.__new__(self.__class__)
-        memo[id(self)] = this
-        this._presto = to or deepcopy(self._presto, memo)
+    def __deepcopy__(self, memo: dict) -> Self:
+        this = super().__deepcopy__(memo)
+        this._session = None
         this._client = httpx.AsyncClient()
         return this

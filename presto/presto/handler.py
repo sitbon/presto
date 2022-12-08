@@ -11,7 +11,7 @@ from .response import Response
 
 __all__ = "Handler",
 
-PrestoT = TypeVar("PrestoT", bound="Presto")
+PrestoT = TypeVar("PrestoT", bound="AsyncPresto")
 
 
 # noinspection PyPep8Naming
@@ -35,14 +35,14 @@ class Handler(Generic[PrestoT]):
         self._session = requests.Session()
 
     def __call__(self, request: Request[Handler[PrestoT]], **kwds) -> Response:
+        request = deepcopy(request)
         if not isinstance(request, self.Request) and not isinstance(request, type(self._presto)):
             raise TypeError(f"request must be of type {self.Request.__name__} or {self._presto.__name__}")
-
         req = adict(request.__request__)
         req.__merge__(kwds)
         req.url = request.__url__
 
-        return self.Response(self.session.request(**req))
+        return self.Response(self, request, self.session.request(**req))
 
     @property
     def APPEND_SLASH(self):
@@ -57,6 +57,10 @@ class Handler(Generic[PrestoT]):
         return self._presto.Response
 
     @property
+    def presto(self):
+        return self._presto
+
+    @property
     def session(self):
         return self._session
 
@@ -66,11 +70,8 @@ class Handler(Generic[PrestoT]):
         this._session = self._session
         return this
 
-    def __deepcopy__(self, memo: dict, to: Optional[PrestoT] = None) -> Self:
-        if id(self) in memo:
-            return memo[id(self)]  # For when Presto calls this directly.
+    def __deepcopy__(self, memo: dict) -> Self:
         this = self.__class__.__new__(self.__class__)
-        memo[id(self)] = this
-        this._presto = to or deepcopy(self._presto, memo)
+        this._presto = self._presto
         this._session = requests.Session()
         return this
