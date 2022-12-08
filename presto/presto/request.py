@@ -6,12 +6,12 @@ from typing import Union, Dict, Self, Any, TypeVar, Generic, Optional
 from copy import copy, deepcopy
 from urllib.parse import urljoin
 
-from .adict import adict
+from presto.adict import adict
 
-__all__ = "_Request",
+__all__ = "Request",
 
-HandlerT = TypeVar("HandlerT", bound="_Handler")
-ResponseT = TypeVar("ResponseT", bound="_Response")
+HandlerT = TypeVar("HandlerT", bound="Handler")
+ResponseT = TypeVar("ResponseT", bound="Response")
 
 
 # noinspection PyPep8Naming
@@ -111,7 +111,7 @@ class __Request__(Generic[HandlerT], ABC):
         return self.__url__ == other.__url__ and self.__request__ == other.__request__
 
 
-class _Request(__Request__):
+class Request(__Request__):
 
     __path__: str
 

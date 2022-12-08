@@ -4,12 +4,12 @@ from typing import Optional, Container
 
 import requests
 
-from .adict import adict
+from presto.adict import adict
 
-__all__ = "_Response",
+__all__ = "Response",
 
 
-class _Response(requests.Response):
+class Response(requests.Response):
     _RAISE_FOR_STATUS: bool = True
     _RAISE_EXCEPT_FOR: Container = set()
 
@@ -30,4 +30,4 @@ class _Response(requests.Response):
 
     def raise_for_status(self):
         if self.status_code not in self._RAISE_EXCEPT_FOR:
-            self._raise_for_status()
+            return self._raise_for_status()

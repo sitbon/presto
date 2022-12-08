@@ -1,4 +1,6 @@
-from .presto import Presto
+from presto.presto import Presto
+
+__all__ = "PrestoClient",
 
 
 class PrestoClient:

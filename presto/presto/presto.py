@@ -4,11 +4,11 @@ from typing import Optional, Union, Type, Self
 
 from copy import copy, deepcopy
 
-from .handler import _Handler
+from presto.adict import adict
+from .handler import Handler as _Handler
 # noinspection PyProtectedMember
-from .request import __Request__, _Request
-from .response import _Response
-from .adict import adict
+from .request import __Request__, Request as _Request
+from .response import Response as _Response
 
 __all__ = "Presto",
 

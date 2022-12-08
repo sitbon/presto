@@ -5,25 +5,25 @@ from typing import Type, TypeVar, Generic, Self, Optional
 from copy import deepcopy
 import requests
 
-from .request import _Request
-from .response import _Response
-from .adict import adict
+from presto.adict import adict
+from .request import Request
+from .response import Response
 
-__all__ = "_Handler",
+__all__ = "Handler",
 
 PrestoT = TypeVar("PrestoT", bound="Presto")
 
 
 # noinspection PyPep8Naming
-class _Handler(Generic[PrestoT]):
+class Handler(Generic[PrestoT]):
     """Base request handler."""
 
     APPEND_SLASH: bool
 
     _presto: PrestoT
 
-    Request: Type[_Request[_Handler[PrestoT]]]
-    Response: Type[_Response]
+    Request: Type[Request[Handler[PrestoT]]]
+    Response: Type[Response]
 
     _session: requests.Session
 
@@ -34,7 +34,7 @@ class _Handler(Generic[PrestoT]):
         self._presto = presto
         self._session = requests.Session()
 
-    def __call__(self, request: _Request[_Handler[PrestoT]], **kwds) -> _Response:
+    def __call__(self, request: Request[Handler[PrestoT]], **kwds) -> Response:
         if not isinstance(request, self.Request) and not isinstance(request, type(self._presto)):
             raise TypeError(f"request must be of type {self.Request.__name__} or {self._presto.__name__}")
 
@@ -49,11 +49,11 @@ class _Handler(Generic[PrestoT]):
         return self._presto.APPEND_SLASH
 
     @property
-    def Request(self) -> Type[_Request[_Handler[PrestoT]]]:
+    def Request(self) -> Type[Request[Handler[PrestoT]]]:
         return self._presto.Request
 
     @property
-    def Response(self) -> Type[_Response]:
+    def Response(self) -> Type[Response]:
         return self._presto.Response
 
     @property
