@@ -25,14 +25,13 @@ class Handler(Generic[PrestoT]):
     Request: Type[Request[Handler[PrestoT]]]
     Response: Type[Response]
 
-    _session: requests.Session
+    _session: Optional[requests.Session] = None
 
     def __init__(
             self,
             presto: PrestoT,
     ):
         self._presto = presto
-        self._session = requests.Session()
 
     def __call__(self, request: Request[Handler[PrestoT]], **kwds) -> Response:
         request = deepcopy(request)
@@ -62,6 +61,8 @@ class Handler(Generic[PrestoT]):
 
     @property
     def session(self):
+        if self._session is None:
+            self._session = requests.Session()
         return self._session
 
     def __copy__(self) -> Self:
@@ -73,5 +74,4 @@ class Handler(Generic[PrestoT]):
     def __deepcopy__(self, memo: dict) -> Self:
         this = self.__class__.__new__(self.__class__)
         this._presto = self._presto
-        this._session = requests.Session()
         return this
