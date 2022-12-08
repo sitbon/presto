@@ -14,6 +14,7 @@ HandlerT = TypeVar("HandlerT", bound="_Handler")
 ResponseT = TypeVar("ResponseT", bound="_Response")
 
 
+# noinspection PyPep8Naming
 class __Request__(Generic[HandlerT], ABC):
 
     __url__: str = None  # abstract
@@ -25,7 +26,7 @@ class __Request__(Generic[HandlerT], ABC):
     def __init__(self, parent: __Request__[HandlerT], **kwds):
         self.__handler__ = parent.__handler__
         self.__parent__ = parent
-        self.__params__ = self.__clean_params__(adict(getattr(self, "__params__", {})).merged(kwds))
+        self.__params__ = self.__clean_params__(adict(getattr(self, "__params__", {})).__merged__(kwds))
         self.__requests__ = dict()
 
     def __repr__(self):
@@ -74,7 +75,7 @@ class __Request__(Generic[HandlerT], ABC):
         if not kwds:
             return self.__handler__(self)
 
-        self.__params__.merge(self.__clean_params__(kwds))
+        self.__params__.__merge__(self.__clean_params__(kwds))
         return self
 
     @property
@@ -82,7 +83,7 @@ class __Request__(Generic[HandlerT], ABC):
         if self.__parent__ is self:
             return self.__params__
 
-        return self.__parent__.__request__.merged(self.__params__)
+        return self.__parent__.__request__.__merged__(self.__params__)
 
     def __copy__(self) -> Self:
         this = self.__class__.__new__(self.__class__)
@@ -124,7 +125,7 @@ class _Request(__Request__):
 
     def __set__(self, instance, value):
         if isinstance(value, dict):
-            self.__params__.merge(value)
+            self.__params__.__merge__(value)
         else:
             raise TypeError(f"Cannot set {self.__class__.__name__} with type {type(value)}")
         return self

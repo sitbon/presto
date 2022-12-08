@@ -39,7 +39,7 @@ class _Handler(Generic[PrestoT]):
             raise TypeError(f"request must be of type {self.Request.__name__} or {self._presto.__name__}")
 
         req = adict(request.__request__)
-        req.merge(kwds)
+        req.__merge__(kwds)
         req.url = request.__url__
 
         return self.Response(self.session.request(**req))
