@@ -1,6 +1,7 @@
 #.*
 #.*/
 
+dist/
 tmp/
 temp/
 local/
