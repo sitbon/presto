@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Type, TypeVar, Self, Optional
+from typing import TypeVar, Optional
 
 from copy import deepcopy
 import requests
@@ -32,11 +32,14 @@ class Handler:
         request = deepcopy(request)
         if not isinstance(request, self._presto.Request) and not isinstance(request, type(self._presto)):
             raise TypeError(f"request must be of type {self._presto.Request.__name__} or {self._presto.__name__}")
-        req = adict(request.__request__)
+        req = adict(request.__merged__)
         req.__merge__(kwds)
         req.url = request.__url__
 
         return self._presto.Response(self, request, self.session.request(**req))
+
+    def call(self, request: Request) -> Response:
+        return Handler.__call__(self, request)
 
     @property
     def APPEND_SLASH(self) -> bool:
@@ -52,13 +55,13 @@ class Handler:
             self._session = requests.Session()
         return self._session
 
-    def __copy__(self) -> Self:
+    def __copy__(self):
         this = self.__class__.__new__(self.__class__)
         this._presto = self._presto
         this._session = self._session
         return this
 
-    def __deepcopy__(self, memo: dict) -> Self:
+    def __deepcopy__(self, memo: dict):
         this = self.__class__.__new__(self.__class__)
         this._presto = self._presto
         return this

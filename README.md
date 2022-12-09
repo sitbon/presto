@@ -141,8 +141,10 @@ typically set `Presto.APPEND_SLASH = True` or inherit from `Presto` in a pre-def
 
 Version 1.0.0 adds support for async requests using the `httpx` library.
 
-The usage is the same as the synchronous version, but calls to the request objects
-need to be awaited.
+The usage is the same as the synchronous version except when it comes to executing requests.
+
+Instead of calling `()` an object to execute the request, the .A attribute is awaited.
+See the example below.
 
 ```python
 import asyncio
@@ -158,11 +160,11 @@ async def main():
 
     print("api:", api)
 
-    note = (await api(headers={"X-User": "Testing"})).note
+    note = api(headers={"X-User": "Testing"}).note
 
     print("api.note:", api.note, "equal:", api.note == note)
 
-    resp = await api.note[4]()
+    resp = await api.note[4].A
 
     print("headers:", resp.request.headers)
     print("response:", resp)

@@ -14,7 +14,7 @@ class Presto(request.__Request__):
 
     APPEND_SLASH: bool = False
 
-    __url__: str = None
+    __url: str = ""
 
     class Handler(handler.Handler):
         """"""
@@ -44,12 +44,20 @@ class Presto(request.__Request__):
             **kwds
     ):
         self.APPEND_SLASH = APPEND_SLASH if APPEND_SLASH is not None else self.APPEND_SLASH
-        super().__init__(self, **kwds)
-        self.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
+        super().__init__(None, **kwds)
+        self.__url__ = url
         self.Handler = Handler or self.Handler
         self.Request = Request or self.Request
         self.Response = Response or self.Response
         self.__handler__ = self.Handler(presto=self)
+
+    @property
+    def __url__(self) -> str:
+        return self.__url
+
+    @__url__.setter
+    def __url__(self, url: str):
+        self.__url = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
 
     @property
     def request(self) -> Presto.Request:
@@ -57,10 +65,10 @@ class Presto(request.__Request__):
         req.__requests__.update(self.__requests__)
         return req
 
-    def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Self, Presto.Response]:
+    def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Presto.Response]:
         if url is not None:
             presto = copy(self)
-            presto.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
+            presto.__url__ = url
             if kwds:
                 return presto.__call__(**kwds)
             return presto
@@ -75,8 +83,8 @@ class Presto(request.__Request__):
     options = property(lambda self: self.request(method="OPTIONS"))
     head = property(lambda self: self.request(method="HEAD"))
 
-    def __copy__(self) -> Self:
-        this = super().__copy__()
+    def __copy__(self) -> Presto:
+        this: Presto = super().__copy__()
         this.__handler__._presto = this
         this.APPEND_SLASH = self.APPEND_SLASH
         this.__url__ = self.__url__

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional, Union, Self, Type
+from typing import Optional, Union, Type
 
-from copy import copy
+import warnings
 
 from presto import presto
 
@@ -41,12 +41,12 @@ class AsyncPresto(presto.Presto):
             **kwds
         )
 
-    async def __call__(self, url: Optional[str] = None, **kwds) -> Union[AsyncPresto, Self, AsyncPresto.Response]:
-        if url is not None:
-            presto_ = copy(self)
-            presto_.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
-            if kwds:
-                return await presto_.__call__(**kwds)
-            return presto_
+    A: AsyncResponse = presto.Presto.Request.__async__
 
-        return await super().__call__(**kwds)
+    def __call__(self, url: Optional[str] = None, **kwds) -> Union[AsyncPresto, AsyncPresto.Response]:
+        if not kwds:
+            raise RuntimeError("Use async method by awaiting .A directly.")
+        return super().__call__(url=url, **kwds)
+
+
+

@@ -22,7 +22,7 @@ class AsyncHandler(Presto.Handler):
     async def __call__(self, request: AsyncRequest, **kwds) -> AsyncResponse:
         request = deepcopy(request)
         url = request.__url__
-        params = adict(request.__request__).__merge__(kwds)
+        params = adict(request.__merged__).__merge__(kwds)
         method = params.pop("method")
         return self._presto.Response(self, request, await self.client.request(method, url, **params))
 
@@ -32,16 +32,12 @@ class AsyncHandler(Presto.Handler):
             self._client = httpx.AsyncClient()
         return self._client
 
-    @property
-    def session(self):
-        return NotImplemented
-
-    def __copy__(self) -> Self:
+    def __copy__(self):
         this = super().__copy__()
         this._client = self._client
         return this
 
-    def __deepcopy__(self, memo) -> Self:
+    def __deepcopy__(self, memo):
         this = super().__deepcopy__(memo)
         this._client = self._client
         return this
