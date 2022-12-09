@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "presto-requests"
-version = "1.0.1"
+version = "1.0.2"
 description = "A modern object-oriented HTTP REST client."
 authors = ["Phillip Sitbon <phillip.sitbon@gmail.com>"]
 readme = "README.md"
