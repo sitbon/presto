@@ -44,16 +44,16 @@ class Presto(request.__Request__):
             **kwds
     ):
         self.APPEND_SLASH = APPEND_SLASH if APPEND_SLASH is not None else self.APPEND_SLASH
+        super().__init__(self, **kwds)
         self.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
         self.Handler = Handler or self.Handler
         self.Request = Request or self.Request
         self.Response = Response or self.Response
         self.__handler__ = self.Handler(presto=self)
-        super().__init__(self, **kwds)
 
     @property
     def request(self) -> Presto.Request:
-        req = self.__handler__.Request(self, "")
+        req = self.Request(self, "")
         req.__requests__.update(self.__requests__)
         return req
 

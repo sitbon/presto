@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Union, Dict, Self, Any, TypeVar
+from typing import Union, Dict, Self, Any, TypeVar, Optional
 
 from copy import copy, deepcopy
 from urllib.parse import urljoin
@@ -17,15 +17,15 @@ ResponseT = TypeVar("ResponseT", bound="Response")
 # noinspection PyPep8Naming
 class __Request__(ABC):
 
-    __url__: str = None  # abstract
-    __handler__: HandlerT
-    __parent__: Self
+    __url__: Optional[str] = None  # abstract
+    __handler__: Optional[HandlerT] = None
+    __parent__: Optional[__Request__] = None
     __params__: adict
     __requests__: Dict[str, __Request__]
 
-    def __init__(self, parent: __Request__, **kwds):
-        self.__handler__ = parent.__handler__
-        self.__parent__ = parent
+    def __init__(self, parent: Optional[__Request__], **kwds):
+        self.__handler__ = parent.__handler__ if parent else None
+        self.__parent__ = parent if parent else None
         self.__params__ = self.__clean_params__(adict(getattr(self, "__params__", {})).__merged__(kwds))
         self.__requests__ = dict()
 
@@ -33,7 +33,7 @@ class __Request__(ABC):
         params = self.__request__
         url = self.__url__
 
-        if self.__url__:
+        if url:
             url = f"url={url!r}"
 
         if params:
@@ -60,7 +60,7 @@ class __Request__(ABC):
         request = self.__requests__.get(name)
 
         if request is None:
-            request = self.__requests__[name] = self.__handler__.Request(self, name)
+            request = self.__requests__[name] = self.__handler__.presto.Request(self, name)
         elif request.__parent__ is not self:
             req = copy(request)
             req.__parent__ = self
@@ -119,7 +119,7 @@ class Request(__Request__):
 
     __path__: str
 
-    def __init__(self, parent: Request, path: str):
+    def __init__(self, parent: __Request__, path: str):
         super().__init__(parent)
 
         if self.__handler__.APPEND_SLASH and not path.endswith("/"):

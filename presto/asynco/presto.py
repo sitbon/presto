@@ -14,13 +14,13 @@ __all__ = "AsyncPresto",
 # noinspection PyPep8Naming
 class AsyncPresto(presto.Presto):
 
-    class Handler(handler.AsyncHandler):
+    class AsyncHandler(handler.AsyncHandler):
         pass
 
-    class Request(request.AsyncRequest):
+    class AsyncRequest(request.AsyncRequest):
         pass
 
-    class Response(response.AsyncResponse):
+    class AsyncResponse(response.AsyncResponse):
         pass
 
     # noinspection PyPep8Naming
@@ -28,16 +28,16 @@ class AsyncPresto(presto.Presto):
             self,
             url: str,
             *,
-            Handler: Optional[Type[AsyncPresto.Handler]] = None,
-            Request: Optional[Type[AsyncPresto.Request]] = None,
-            Response: Optional[Type[AsyncPresto.Response]] = None,
+            Handler: Optional[Type[AsyncPresto.AsyncHandler]] = None,
+            Request: Optional[Type[AsyncPresto.AsyncRequest]] = None,
+            Response: Optional[Type[AsyncPresto.AsyncResponse]] = None,
             **kwds
     ):
         super().__init__(
             url=url,
-            Handler=Handler or self.Handler,
-            Request=Request or self.Request,
-            Response=Response or self.Response,
+            Handler=Handler or self.AsyncHandler,
+            Request=Request or self.AsyncRequest,
+            Response=Response or self.AsyncResponse,
             **kwds
         )
 

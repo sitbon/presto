@@ -16,6 +16,7 @@ PrestoT = TypeVar("PrestoT", bound="AsyncPresto")
 
 
 class AsyncHandler(Presto.Handler):
+
     _client: Optional[httpx.AsyncClient] = None
 
     async def __call__(self, request: AsyncRequest, **kwds) -> AsyncResponse:
@@ -23,19 +24,7 @@ class AsyncHandler(Presto.Handler):
         url = request.__url__
         params = adict(request.__request__).__merge__(kwds)
         method = params.pop("method")
-        return self.Response(self, request, await self.client.request(method, url, **params))
-
-    @property
-    def Request(self) -> Type[AsyncRequest]:
-        return self._presto.Request
-
-    @property
-    def Response(self) -> Type[AsyncResponse]:
-        return self._presto.Response
-
-    @property
-    def presto(self) -> PrestoT:
-        return self._presto
+        return self._presto.Response(self, request, await self.client.request(method, url, **params))
 
     @property
     def client(self) -> httpx.AsyncClient:
