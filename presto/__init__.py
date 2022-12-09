@@ -1,4 +1,4 @@
 from .presto import *
 from .client import *
 
-__all__ = "AsyncPresto", "AsyncPrestoClient"
+__all__ = "Presto", "PrestoClient"

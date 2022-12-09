@@ -1,6 +1,6 @@
 from typing import Type, Optional
 
-from presto.presto import client
+from presto import client
 
 from . import presto
 
