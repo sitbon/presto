@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, Self, Any, TypeVar, Optional, TypeAlias
+from typing import Self, Any, TypeVar, Optional, TypeAlias
 
 from copy import copy, deepcopy
 from urllib.parse import urljoin
@@ -96,7 +96,7 @@ class __Request__(ABC):
 
         return request
 
-    def __call__(self, **kwds) -> Union[Self, ResponseT]:
+    def __call__(self, **kwds) -> Self | ResponseT:
         if not kwds:
             return self.__handle__()
 
@@ -127,7 +127,7 @@ class __Request__(ABC):
         return this
 
     @classmethod
-    def __clean_params__(cls, params: Union[adict, dict[str, Any]]) -> Union[adict, dict[str, Any]]:
+    def __clean_params__(cls, params: adict | dict[str, Any]) -> adict | dict[str, Any]:
         if "url" in params:
             raise ValueError("url is a reserved parameter name")
 

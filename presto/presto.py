@@ -1,4 +1,4 @@
-from typing import Optional, Union, Type, Self, TypeAlias, TypeVar
+from typing import Optional, Type, Self, TypeAlias, TypeVar
 
 from copy import copy, deepcopy
 
@@ -66,7 +66,7 @@ class Presto(request.Request.__Request__):
         req.__requests__.update(self.__requests__)
         return req
 
-    def __call__(self, url: Optional[str] = None, **kwds) -> Union[Self, Response]:
+    def __call__(self, url: Optional[str] = None, **kwds) -> Self | Response:
         if url is not None:
             presto = copy(self)
             presto.__url__ = url
