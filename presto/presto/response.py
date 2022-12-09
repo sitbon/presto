@@ -16,7 +16,7 @@ class Response(requests.Response):
     _RAISE_FOR_STATUS: bool = True
     _RAISE_EXCEPT_FOR: Container = set()
 
-    attr: Optional[adict] = None
+    _attr: Optional[adict] = None
 
     __handler: HandlerT
     __request: RequestT
@@ -29,8 +29,12 @@ class Response(requests.Response):
         if self._RAISE_FOR_STATUS is True:
             self.raise_for_status()
 
-        if self.status_code == 200 and self.headers.get("content-type").startswith("application/json"):
-            self.attr = adict(self.json())
+    @property
+    def attr(self) -> adict:
+        if self._attr is None:
+            if self.status_code == 200 and self.headers.get("content-type").startswith("application/json"):
+                self._attr = adict(self.json())
+        return self._attr
 
     @property
     def handler(self) -> HandlerT:
