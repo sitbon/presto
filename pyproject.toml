@@ -1,9 +1,25 @@
 [tool.poetry]
 name = "presto-requests"
-version = "1.0.0"
-description = ""
+version = "1.0.1"
+description = "A modern object-oriented HTTP REST client."
 authors = ["Phillip Sitbon <phillip.sitbon@gmail.com>"]
 readme = "README.md"
+license = "AGPLv3"
+repository = "https://github.com/sitbon/presto"
+classifiers= [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries",
+]
 
 packages = [
   { include = "presto" },
