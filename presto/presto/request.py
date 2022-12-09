@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Union, Dict, Self, Any, TypeVar, Generic, Optional
+from typing import Union, Dict, Self, Any, TypeVar
 
 from copy import copy, deepcopy
 from urllib.parse import urljoin
@@ -15,15 +15,15 @@ ResponseT = TypeVar("ResponseT", bound="Response")
 
 
 # noinspection PyPep8Naming
-class __Request__(Generic[HandlerT], ABC):
+class __Request__(ABC):
 
     __url__: str = None  # abstract
     __handler__: HandlerT
-    __parent__: __Request__[HandlerT]
+    __parent__: Self
     __params__: adict
-    __requests__: Dict[str, __Request__[HandlerT]]
+    __requests__: Dict[str, __Request__]
 
-    def __init__(self, parent: __Request__[HandlerT], **kwds):
+    def __init__(self, parent: __Request__, **kwds):
         self.__handler__ = parent.__handler__
         self.__parent__ = parent
         self.__params__ = self.__clean_params__(adict(getattr(self, "__params__", {})).__merged__(kwds))
@@ -53,7 +53,7 @@ class __Request__(Generic[HandlerT], ABC):
 
         return params
 
-    def __getattr__(self, name: str) -> __Request__[HandlerT]:
+    def __getattr__(self, name: str) -> __Request__:
         if name.startswith("__") and name.endswith("__"):
             raise AttributeError(name)  # Most likely an accidentally invalid internal attribute/method access.
 
@@ -68,7 +68,7 @@ class __Request__(Generic[HandlerT], ABC):
 
         return request
 
-    def __getitem__(self, item) -> __Request__[HandlerT]:
+    def __getitem__(self, item) -> __Request__:
         return self.__getattr__(str(item))
 
     def __call__(self, **kwds) -> Union[Self, ResponseT]:
@@ -119,7 +119,7 @@ class Request(__Request__):
 
     __path__: str
 
-    def __init__(self, parent: __Request__, path: str):
+    def __init__(self, parent: Request, path: str):
         super().__init__(parent)
 
         if self.__handler__.APPEND_SLASH and not path.endswith("/"):

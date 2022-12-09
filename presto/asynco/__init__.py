@@ -1,12 +1,11 @@
-from .presto import AsyncPresto as Presto
-from .client import AsyncPrestoClient as PrestoClient
+from . import presto, client
 
 __all__ = "AsyncPresto", "AsyncPrestoClient"
 
 
-class AsyncPresto(Presto):
+class AsyncPresto(presto.AsyncPresto):
     pass
 
 
-class AsyncPrestoClient(PrestoClient):
+class AsyncPrestoClient(client.AsyncPrestoClient):
     pass

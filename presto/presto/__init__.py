@@ -1,12 +1,11 @@
-from . import presto as _presto
-from . import client as _client
+from . import presto, client
 
 __all__ = "Presto", "PrestoClient"
 
 
-class Presto(_presto.Presto):
+class Presto(presto.Presto):
     pass
 
 
-class PrestoClient(_client.PrestoClient):
+class PrestoClient(client.PrestoClient):
     pass

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Iterator
+from typing import Union
 
 from attrdict import AttrDict
 

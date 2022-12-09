@@ -1,13 +1,13 @@
 from typing import Self, TypeVar, Union
 
-from presto.presto import Presto
+from presto import presto
 
 __all__ = "AsyncRequest",
 
 ResponseT = TypeVar("ResponseT", bound="AsyncResponse")
 
 
-class AsyncRequest(Presto.Request):
+class AsyncRequest(presto.Presto.Request):
 
     async def __call__(self, **kwds) -> Union[Self, ResponseT]:
         if not kwds:

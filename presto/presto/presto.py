@@ -5,24 +5,25 @@ from typing import Optional, Union, Type, Self
 from copy import copy, deepcopy
 
 from presto.adict import adict
-from .handler import Handler as _Handler
-# noinspection PyProtectedMember
-from .request import __Request__, Request as _Request
-from .response import Response as _Response
+from . import handler, request, response
 
 __all__ = "Presto",
 
 
-# noinspection PyPep8Naming
-class Presto(__Request__):
+class Presto(request.__Request__):
 
     APPEND_SLASH: bool = False
 
     __url__: str = None
 
-    Handler: Type[_Handler[Presto]] = _Handler
-    Request: Type[_Request[_Handler[Presto]]] = _Request
-    Response: Type[_Response] = _Response
+    class Handler(handler.Handler):
+        """"""
+
+    class Request(request.Request):
+        """"""
+
+    class Response(response.Response):
+        """"""
 
     __params__: adict = adict(
         method="GET",
@@ -31,13 +32,14 @@ class Presto(__Request__):
         ),
     )
 
+    # noinspection PyPep8Naming
     def __init__(
             self,
             url: str,
             *,
-            Handler: Type[_Handler[Presto]] = _Handler,
-            Request: Type[_Request[_Handler[Presto]]] = _Request,
-            Response: Type[_Response] = _Response,
+            Handler: Type[Presto.Handler] = Handler,
+            Request: Type[Presto.Request] = Request,
+            Response: Type[Presto.Response] = Response,
             APPEND_SLASH: bool = APPEND_SLASH,
             **kwds
     ):
@@ -50,12 +52,12 @@ class Presto(__Request__):
         super().__init__(self, **kwds)
 
     @property
-    def request(self):
-        request = self.__handler__.Request(self, "")
-        request.__requests__.update(self.__requests__)
-        return request
+    def request(self) -> Presto.Request:
+        req = self.__handler__.Request(self, "")
+        req.__requests__.update(self.__requests__)
+        return req
 
-    def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Self, Response]:
+    def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Self, Presto.Response]:
         if url is not None:
             presto = copy(self)
             presto.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")

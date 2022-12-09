@@ -21,7 +21,6 @@ class Response(requests.Response):
     __handler: HandlerT
     __request: RequestT
 
-    # noinspection PyMissingConstructor
     def __init__(self, handler: HandlerT, request: RequestT, response: requests.Response):
         self.__handler = handler
         self.__request = request
@@ -34,11 +33,11 @@ class Response(requests.Response):
             self.attr = adict(self.json())
 
     @property
-    def handler(self):
+    def handler(self) -> HandlerT:
         return self.__handler
 
     @property
-    def prequest(self):
+    def prequest(self) -> RequestT:
         return self.__request
 
     def _raise_for_status(self):

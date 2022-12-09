@@ -2,6 +2,11 @@
 
 An object-oriented REST API client & requests extesion library.
 
+As of version 1.0.0, this library can be considered stable, and significant
+changes to the interface or new features are unlikely to be introduced.
+
+#### Note: This library requires Python 3.11.0rc1 or later.
+
 ## Installation
 
 ```bash
@@ -9,6 +14,14 @@ pip install presto-requests
 ```
 ```bash
 poetry add presto-requests
+```
+
+#### With async support using httpx:
+```bash
+pip install presto-requests[async]
+```
+```bash
+poetry add presto-requests --extras async
 ```
 
 ### Concept:
@@ -20,7 +33,7 @@ It provides a simple way to create a REST API client that is object-oriented and
 
 ```python
 from pprint import pprint
-from presto import Presto
+from presto.presto import Presto
 
 presto = Presto("https://api.github.com")
 
@@ -89,7 +102,7 @@ and parent parameters while using the same component path and parameters.
 For example:
 
 ```python
-from presto import Presto
+from presto.presto import Presto
 
 presto = Presto("http://127.0.0.1:8000", APPEND_SLASH=True)
 
@@ -108,13 +121,13 @@ print("req headers:", resp.request.headers)
 print("resp:", resp)
 print("note:", resp.attr)
 ```
-```output
+```shell
 api: Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json')))
 presto.request.api: Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json')))
 api(...): Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json', X-User='Testing'), allow_redirects=False))
 req headers: {'User-Agent': 'python-requests/2.28.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'X-User': 'Testing'}
 resp: <Response [200]>
-note: adict(id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection={'id': 3, 'url': 'http://127.0.0.1:8000/api/note/coll/3/', 'name': 'Public', 'public': True, 'notes': 1})
+note: adict(user='', id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection={'id': 3, 'url': 'http://127.0.0.1:8000/api/note/coll/3/', 'name': 'Public', 'public': True, 'notes': 1})
 ```
 
 `response.attr` is an `adict` instance, which is a dictionary that can be accessed as attributes.
@@ -122,3 +135,48 @@ It contains the JSON-decoded content of a response, if any.
 
 `APPEND_SLASH` is meant to be client implementation-specific, e.g. for a Django Rest Framework client, one would
 typically set `Presto.APPEND_SLASH = True` or inherit from `Presto` in a pre-defined API client class.
+
+# Async Support
+
+Version 1.0.0 adds support for async requests using the `httpx` library.
+
+The usage is the same as the synchronous version, but calls that trigger requests
+must be awaited.
+
+```python
+import asyncio
+from presto.asynco import AsyncPresto
+
+async def main():
+    presto = AsyncPresto("http://127.0.0.1:8000", APPEND_SLASH=True)
+    print("presto:", presto)
+
+    api = presto.api
+
+    print("api:", api)
+    print("presto.request.api:", presto.request.api)
+    print("equal:", presto.request.api == api)
+
+    api = await api(headers={"X-User": "Testing"})
+    
+    print("api(...):", api)
+
+    resp = await api.note[4]()
+
+    print("req headers:", resp.request.headers)
+    print("resp:", resp)
+    print("note:", resp.attr)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+```shell
+presto: AsyncPresto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json')))
+api: Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json')))
+presto.request.api: Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json')))
+equal: True
+api(...): Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json', X-User='Testing')))
+req headers: Headers({'host': '127.0.0.1:8000', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.23.1', 'accept': 'application/json', 'x-user': 'Testing'})
+resp: <Response [200 OK]>
+note: adict(user='', id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection={'id': 3, 'url': 'http://127.0.0.1:8000/api/note/coll/3/', 'name': 'Public', 'public': True, 'notes': 1})
+```

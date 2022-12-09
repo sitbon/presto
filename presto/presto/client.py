@@ -1,13 +1,22 @@
-from .presto import Presto
+from __future__ import annotations
+
+from typing import Type
+
+from presto.adict import adict
+
+from . import presto
 
 __all__ = "PrestoClient",
 
 
 class PrestoClient:
-    """Template class for Presto client API implementations."""
+    """Base class for Presto client API implementations."""
+
     _APPEND_SLASH: bool = False
-    _presto: Presto
-    _params: dict = dict(
+
+    _presto: presto.Presto
+
+    _params: adict = adict(
         method="GET",
         headers={
             "Accept": "application/json",
@@ -15,23 +24,37 @@ class PrestoClient:
         },
     )
 
-    class Handler(Presto.Handler):
-        """Placeholder for readability."""
+    class Handler(presto.Presto.Handler):
+        pass
 
-    class Request(Presto.Request):
-        """Placeholder for readability."""
+    class Request(presto.Presto.Request):
+        pass
 
-    class Response(Presto.Response):
-        """Placeholder for readability."""
+    class Response(presto.Presto.Response):
+        pass
 
-    def __init__(self, url: str):
+    # noinspection PyPep8Naming
+    def __init__(
+            self,
+            url: str,
+            *,
+            Presto: Type[presto.Presto] = presto.Presto,
+            Handler: Type[PrestoClient.Handler] = Handler,
+            Request: Type[PrestoClient.Request] = Request,
+            Response: Type[PrestoClient.Response] = Response,
+            APPEND_SLASH: bool = _APPEND_SLASH,
+            **kwds
+    ):
+        if kwds:
+            self._params.__merge__(kwds)
+
         self._presto = Presto(
             url=url,
-            Handler=self.Handler,
-            Request=self.Request,
-            Response=self.Response,
-            APPEND_SLASH=self._APPEND_SLASH,
-            **self._params
+            Handler=Handler,
+            Request=Request,
+            Response=Response,
+            APPEND_SLASH=APPEND_SLASH,
+            **self._params,
         )
 
     @property

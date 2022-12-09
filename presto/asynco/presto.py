@@ -4,34 +4,32 @@ from typing import Optional, Union, Self, Type
 
 from copy import copy
 
-from presto.presto import Presto
+from presto import presto
 
-from .handler import AsyncHandler as _AsyncHandler
-from .request import AsyncRequest as _AsyncRequest
-from .response import AsyncResponse as _AsyncResponse
+from . import handler, request, response
 
 __all__ = "AsyncPresto",
 
 
 # noinspection PyPep8Naming
-class AsyncPresto(Presto):
+class AsyncPresto(presto.Presto):
 
-    class AsyncHandler(_AsyncHandler):
+    class Handler(handler.AsyncHandler):
         pass
 
-    class AsyncRequest(_AsyncRequest):
+    class Request(request.AsyncRequest):
         pass
 
-    class AsyncResponse(_AsyncResponse):
+    class Response(response.AsyncResponse):
         pass
 
     def __init__(
             self,
             url: str,
             *,
-            Handler: Type[AsyncHandler[Presto]] = AsyncHandler,
-            Request: Type[AsyncRequest[AsyncHandler[Presto]]] = AsyncRequest,
-            Response: Type[AsyncResponse] = AsyncResponse,
+            Handler: Type[AsyncPresto.Handler] = Handler,
+            Request: Type[AsyncPresto.Request] = Request,
+            Response: Type[AsyncPresto.Response] = Response,
             **kwds
     ):
         super().__init__(
@@ -42,7 +40,7 @@ class AsyncPresto(Presto):
             **kwds
         )
 
-    async def __call__(self, url: Optional[str] = None, **kwds) -> Union[AsyncPresto, Self, AsyncResponse]:
+    async def __call__(self, url: Optional[str] = None, **kwds) -> Union[AsyncPresto, Self, AsyncPresto.Response]:
         if url is not None:
             presto = copy(self)
             presto.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")

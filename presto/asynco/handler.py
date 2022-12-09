@@ -1,4 +1,4 @@
-from typing import TypeVar, Self, Optional
+from typing import TypeVar, Self, Optional, Type
 
 from copy import deepcopy
 import httpx
@@ -6,6 +6,7 @@ import httpx
 from presto.adict import adict
 from presto.presto import Presto
 
+from .request import AsyncRequest
 from .response import AsyncResponse
 
 __all__ = "AsyncHandler",
@@ -17,15 +18,27 @@ PrestoT = TypeVar("PrestoT", bound="AsyncPresto")
 class AsyncHandler(Presto.Handler):
     _client: Optional[httpx.AsyncClient] = None
 
-    async def __call__(self, request: Presto.Request, **kwds) -> Presto.Response:
+    async def __call__(self, request: AsyncRequest, **kwds) -> AsyncResponse:
         request = deepcopy(request)
         url = request.__url__
         params = adict(request.__request__).__merge__(kwds)
         method = params.pop("method")
-        return self.presto.Response(self, request, await self.client.request(method, url, **params))
+        return self.Response(self, request, await self.client.request(method, url, **params))
 
     @property
-    def client(self):
+    def Request(self) -> Type[AsyncRequest]:
+        return self._presto.Request
+
+    @property
+    def Response(self) -> Type[AsyncResponse]:
+        return self._presto.Response
+
+    @property
+    def presto(self) -> PrestoT:
+        return self._presto
+
+    @property
+    def client(self) -> httpx.AsyncClient:
         if self._client is None:
             self._client = httpx.AsyncClient()
         return self._client
@@ -36,5 +49,10 @@ class AsyncHandler(Presto.Handler):
 
     def __copy__(self) -> Self:
         this = super().__copy__()
+        this._client = self._client
+        return this
+
+    def __deepcopy__(self, memo) -> Self:
+        this = super().__deepcopy__(memo)
         this._client = self._client
         return this
