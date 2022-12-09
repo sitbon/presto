@@ -102,7 +102,7 @@ and parent parameters while using the same component path and parameters.
 For example:
 
 ```python
-from presto import Presto
+from presto.presto import Presto
 
 presto = Presto("http://127.0.0.1:8000", APPEND_SLASH=True)
 
