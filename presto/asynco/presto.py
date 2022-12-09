@@ -23,29 +23,30 @@ class AsyncPresto(presto.Presto):
     class Response(response.AsyncResponse):
         pass
 
+    # noinspection PyPep8Naming
     def __init__(
             self,
             url: str,
             *,
-            Handler: Type[AsyncPresto.Handler] = Handler,
-            Request: Type[AsyncPresto.Request] = Request,
-            Response: Type[AsyncPresto.Response] = Response,
+            Handler: Optional[Type[AsyncPresto.Handler]] = None,
+            Request: Optional[Type[AsyncPresto.Request]] = None,
+            Response: Optional[Type[AsyncPresto.Response]] = None,
             **kwds
     ):
         super().__init__(
             url=url,
-            Handler=Handler,
-            Request=Request,
-            Response=Response,
+            Handler=Handler or self.Handler,
+            Request=Request or self.Request,
+            Response=Response or self.Response,
             **kwds
         )
 
     async def __call__(self, url: Optional[str] = None, **kwds) -> Union[AsyncPresto, Self, AsyncPresto.Response]:
         if url is not None:
-            presto = copy(self)
-            presto.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
+            presto_ = copy(self)
+            presto_.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
             if kwds:
-                return await presto.__call__(**kwds)
-            return presto
+                return await presto_.__call__(**kwds)
+            return presto_
 
         return await super().__call__(**kwds)

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Type
+from typing import Type, Optional
 
 from presto.presto import client
 
-from .presto import AsyncPresto
+from . import presto
 
 __all__ = "AsyncPrestoClient",
 
@@ -12,15 +12,15 @@ __all__ = "AsyncPrestoClient",
 class AsyncPrestoClient(client.PrestoClient):
     """Base class for Presto client API implementations."""
 
-    _presto: AsyncPresto
+    _presto: presto.AsyncPresto
 
-    class Handler(AsyncPresto.Handler):
+    class AsyncHandler(presto.AsyncPresto.Handler):
         """Placeholder for readability."""
 
-    class Request(AsyncPresto.Request):
+    class AsyncRequest(presto.AsyncPresto.Request):
         """Placeholder for readability."""
 
-    class Response(AsyncPresto.Response):
+    class AsyncResponse(presto.AsyncPresto.Response):
         """Placeholder for readability."""
 
     # noinspection PyPep8Naming
@@ -28,19 +28,18 @@ class AsyncPrestoClient(client.PrestoClient):
             self,
             url: str,
             *,
-            Handler: Type[AsyncPrestoClient.Handler] = Handler,
-            Request: Type[AsyncPrestoClient.Request] = Request,
-            Response: Type[AsyncPrestoClient.Response] = Response,
-            APPEND_SLASH: bool = client.PrestoClient._APPEND_SLASH,
+            Presto: Optional[Type[presto.AsyncPresto]] = None,
+            Handler: Optional[Type[AsyncPrestoClient.AsyncHandler]] = None,
+            Request: Optional[Type[AsyncPrestoClient.AsyncRequest]] = None,
+            Response: Optional[Type[AsyncPrestoClient.AsyncResponse]] = None,
             **kwds
     ):
         super().__init__(
             url=url,
-            Presto=AsyncPresto,
-            Handler=Handler,
-            Request=Request,
-            Response=Response,
-            APPEND_SLASH=APPEND_SLASH,
+            Presto=Presto or presto.AsyncPresto,
+            Handler=Handler or self.AsyncHandler,
+            Request=Request or self.AsyncRequest,
+            Response=Response or self.AsyncResponse,
             **kwds,
         )
 

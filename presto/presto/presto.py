@@ -37,18 +37,18 @@ class Presto(request.__Request__):
             self,
             url: str,
             *,
-            Handler: Type[Presto.Handler] = Handler,
-            Request: Type[Presto.Request] = Request,
-            Response: Type[Presto.Response] = Response,
-            APPEND_SLASH: bool = APPEND_SLASH,
+            Handler: Optional[Type[Presto.Handler]] = None,
+            Request: Optional[Type[Presto.Request]] = None,
+            Response: Optional[Type[Presto.Response]] = None,
+            APPEND_SLASH: Optional[bool] = None,
             **kwds
     ):
-        self.APPEND_SLASH = APPEND_SLASH
+        self.APPEND_SLASH = APPEND_SLASH if APPEND_SLASH is not None else self.APPEND_SLASH
         self.__url__ = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
-        self.Handler = Handler
-        self.Request = Request
-        self.Response = Response
-        self.__handler__ = Handler(presto=self)
+        self.Handler = Handler or self.Handler
+        self.Request = Request or self.Request
+        self.Response = Response or self.Response
+        self.__handler__ = self.Handler(presto=self)
         super().__init__(self, **kwds)
 
     @property
