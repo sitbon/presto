@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Type, Optional
 
 from presto.adict import adict
@@ -22,24 +20,15 @@ class PrestoClient:
         },
     )
 
-    class Handler(presto.Presto.Handler):
-        pass
-
-    class Request(presto.Presto.Request):
-        pass
-
-    class Response(presto.Presto.Response):
-        pass
-
     # noinspection PyPep8Naming
     def __init__(
             self,
             url: str,
             *,
             Presto: Optional[Type[presto.Presto]] = None,
-            Handler: Optional[Type[PrestoClient.Handler]] = None,
-            Request: Optional[Type[PrestoClient.Request]] = None,
-            Response: Optional[Type[PrestoClient.Response]] = None,
+            Handler: Optional[Type[presto.Presto.Handler]] = None,
+            Request: Optional[Type[presto.Presto.Request]] = None,
+            Response: Optional[Type[presto.Presto.Response]] = None,
             **kwds
     ):
         if kwds:
@@ -49,9 +38,9 @@ class PrestoClient:
 
         self._presto = Presto(
             url=url,
-            Handler=Handler or self.Handler,
-            Request=Request or self.Request,
-            Response=Response or self.Response,
+            Handler=Handler,
+            Request=Request,
+            Response=Response,
             **self._params,
         )
 

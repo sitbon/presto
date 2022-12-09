@@ -1,21 +1,19 @@
-from __future__ import annotations
-
-from typing import TypeVar, Optional
+from typing import Optional, TypeAlias, Self
 
 from copy import deepcopy
 import requests
 
 from presto.adict import adict
-from .request import Request
-from .response import Response
+
+from . import request, response
 
 __all__ = "Handler",
 
-PrestoT = TypeVar("PrestoT", bound="Presto")
+PrestoT: TypeAlias = request.RequestT
 
 
 # noinspection PyPep8Naming
-class Handler:
+class Handler(request.Request.__Handler__):
     """Base request handler."""
 
     _presto: PrestoT
@@ -28,18 +26,18 @@ class Handler:
     ):
         self._presto = presto
 
-    def __call__(self, request: Request, **kwds) -> Response:
-        request = deepcopy(request)
-        if not isinstance(request, self._presto.Request) and not isinstance(request, type(self._presto)):
+    def __call__(self, requ: request.Request, **kwds) -> response.Response:
+        requ = deepcopy(requ)
+        if not isinstance(requ, self._presto.Request) and not isinstance(requ, type(self._presto)):
             raise TypeError(f"request must be of type {self._presto.Request.__name__} or {self._presto.__name__}")
-        req = adict(request.__merged__)
-        req.__merge__(kwds)
-        req.url = request.__url__
+        resreq = adict(requ.__merged__)
+        resreq.__merge__(kwds)
+        resreq.url = requ.__url__
 
-        return self._presto.Response(self, request, self.session.request(**req))
+        return self._presto.Response(self, resreq, self.session.request(**resreq))
 
-    def call(self, request: Request) -> Response:
-        return Handler.__call__(self, request)
+    def call(self, requ: request.Request) -> response.Response:
+        return Handler.__call__(self, requ)
 
     @property
     def APPEND_SLASH(self) -> bool:
@@ -55,13 +53,13 @@ class Handler:
             self._session = requests.Session()
         return self._session
 
-    def __copy__(self):
+    def __copy__(self) -> Self:
         this = self.__class__.__new__(self.__class__)
         this._presto = self._presto
         this._session = self._session
         return this
 
-    def __deepcopy__(self, memo: dict):
+    def __deepcopy__(self, memo: dict) -> Self:
         this = self.__class__.__new__(self.__class__)
         this._presto = self._presto
         return this

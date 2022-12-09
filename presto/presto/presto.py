@@ -1,16 +1,17 @@
-from __future__ import annotations
-
-from typing import Optional, Union, Type, Self
+from typing import Optional, Union, Type, Self, TypeAlias, TypeVar
 
 from copy import copy, deepcopy
 
-from presto.adict import adict
 from . import handler, request, response
 
 __all__ = "Presto",
 
+HandlerT: TypeAlias = TypeVar("HandlerT", bound="Presto.Handler")
+RequestT: TypeAlias = TypeVar("RequestT", bound="Presto.Request")
+ResponseT: TypeAlias = TypeVar("ResponseT", bound="Presto.Response")
 
-class Presto(request.__Request__):
+
+class Presto(request.Request.__Request__):
 
     APPEND_SLASH: bool = False
 
@@ -25,9 +26,9 @@ class Presto(request.__Request__):
     class Response(response.Response):
         """"""
 
-    __params__: adict = adict(
+    __params__: dict = dict(
         method="GET",
-        headers=adict(
+        headers=dict(
             Accept="application/json",
         ),
     )
@@ -37,9 +38,9 @@ class Presto(request.__Request__):
             self,
             url: str,
             *,
-            Handler: Optional[Type[Presto.Handler]] = None,
-            Request: Optional[Type[Presto.Request]] = None,
-            Response: Optional[Type[Presto.Response]] = None,
+            Handler: Optional[Type[HandlerT]] = None,
+            Request: Optional[Type[RequestT]] = None,
+            Response: Optional[Type[ResponseT]] = None,
             APPEND_SLASH: Optional[bool] = None,
             **kwds
     ):
@@ -60,12 +61,12 @@ class Presto(request.__Request__):
         self.__url = url + ("/" if self.APPEND_SLASH and url[-1:] != "/" else "")
 
     @property
-    def request(self) -> Presto.Request:
+    def request(self) -> Request:
         req = self.Request(self, "")
         req.__requests__.update(self.__requests__)
         return req
 
-    def __call__(self, url: Optional[str] = None, **kwds) -> Union[Presto, Presto.Response]:
+    def __call__(self, url: Optional[str] = None, **kwds) -> Union[Self, Response]:
         if url is not None:
             presto = copy(self)
             presto.__url__ = url
@@ -83,8 +84,8 @@ class Presto(request.__Request__):
     options = property(lambda self: self.request(method="OPTIONS"))
     head = property(lambda self: self.request(method="HEAD"))
 
-    def __copy__(self) -> Presto:
-        this: Presto = super().__copy__()
+    def __copy__(self) -> Self:
+        this: Self = super().__copy__()
         this.__handler__._presto = this
         this.APPEND_SLASH = self.APPEND_SLASH
         this.__url__ = self.__url__
@@ -94,7 +95,7 @@ class Presto(request.__Request__):
         return this
 
     def __deepcopy__(self, memo: dict) -> Self:
-        this = super().__deepcopy__(memo)
+        this: Self = super().__deepcopy__(memo)
         this.__handler__._presto = this
         this.APPEND_SLASH = self.APPEND_SLASH
         this.__url__ = self.__url__

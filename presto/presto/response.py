@@ -1,30 +1,27 @@
-from __future__ import annotations
-
-from typing import Optional, Container, TypeVar
+from typing import Optional, Container, TypeVar, TypeAlias
 
 import requests
 
 from presto.adict import adict
 
+from . import request
+
 __all__ = "Response",
 
-HandlerT = TypeVar("HandlerT", bound="Handler")
-RequestT = TypeVar("RequestT", bound="Request")
 
-
-class Response(requests.Response):
+class Response(requests.Response, request.Request.__Response__):
     _RAISE_FOR_STATUS: bool = True
     _RAISE_EXCEPT_FOR: Container = set()
 
     _attr: Optional[adict] = None
 
-    __handler: HandlerT
-    __request: RequestT
+    __handler: request.HandlerT
+    __request: request.Request
 
-    def __init__(self, handler: HandlerT, request: RequestT, response: requests.Response):
-        self.__handler = handler
-        self.__request = request
-        self.__dict__ = response.__dict__
+    def __init__(self, hand: request.HandlerT, requ: request.Request, resp: requests.Response):
+        self.__handler = hand
+        self.__request = requ
+        self.__dict__ = resp.__dict__
 
         if self._RAISE_FOR_STATUS is True:
             self.raise_for_status()
@@ -37,11 +34,11 @@ class Response(requests.Response):
         return self._attr
 
     @property
-    def handler(self) -> HandlerT:
+    def handler(self) -> request.HandlerT:
         return self.__handler
 
     @property
-    def prequest(self) -> RequestT:
+    def prequest(self) -> request.Request:
         return self.__request
 
     def _raise_for_status(self):

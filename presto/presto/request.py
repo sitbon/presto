@@ -1,28 +1,39 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
-from typing import Union, Dict, Self, Any, TypeVar, Optional
+from typing import Union, Self, Any, TypeVar, Optional, TypeAlias
 
 from copy import copy, deepcopy
 from urllib.parse import urljoin
 
 from presto.adict import adict
 
-__all__ = "Request",
+__all__ = "HandlerT", "RequestT", "ResponseT", "Request"
 
-HandlerT = TypeVar("HandlerT", bound="Handler")
-ResponseT = TypeVar("ResponseT", bound="Response")
+HandlerT: TypeAlias = TypeVar("HandlerT", bound="__Request__.__Handler__")
+RequestT: TypeAlias = TypeVar("RequestT", bound="__Request__")
+ResponseT: TypeAlias = TypeVar("ResponseT", bound="__Request__.__Response__")
 
 
 # noinspection PyPep8Naming
 class __Request__(ABC):
 
-    __handler__: Optional[HandlerT] = None
-    __parent__: Optional[__Request__] = None
-    __params__: adict
-    __requests__: Dict[str, __Request__]
+    # noinspection PyPep8Naming
+    class __Handler__(ABC):
+        @abstractmethod
+        def __call__(self, requ: RequestT, **kwds) -> ResponseT:
+            raise NotImplementedError
 
-    def __init__(self, parent: Optional[__Request__], **kwds):
+    # noinspection PyPep8Naming
+    class __Response__(ABC):
+        @abstractmethod
+        def __init__(self, hand: HandlerT, requ: RequestT, resp: ResponseT):
+            raise NotImplementedError
+
+    __handler__: Optional[HandlerT] = None
+    __parent__: Optional[RequestT] = None
+    __params__: adict
+    __requests__: dict[str, RequestT]
+
+    def __init__(self, parent: Optional[RequestT], **kwds):
         self.__handler__ = parent.__handler__ if parent else None
         self.__parent__ = parent if parent else None
         self.__params__ = self.__clean_params__(adict(getattr(self, "__params__", {})).__merged__(kwds))
@@ -67,10 +78,10 @@ class __Request__(ABC):
     async def __async__(self) -> ResponseT:
         return await self.__handler__(self)
 
-    def __getitem__(self, item) -> __Request__:
+    def __getitem__(self, item) -> Self:
         return self.__getattr__(str(item))
 
-    def __getattr__(self, name: str) -> __Request__:
+    def __getattr__(self, name: str) -> Self:
         if "__" in name:
             raise AttributeError(name)  # Most likely an accidentally invalid internal attribute/method access.
 
@@ -92,7 +103,7 @@ class __Request__(ABC):
         self.__merge__(**kwds)
         return self
 
-    def __copy__(self):
+    def __copy__(self) -> Self:
         this = self.__class__.__new__(self.__class__)
         # this.__url__ = self.__url__  # (Skip "fake abstract" property)
         this.__handler__ = copy(self.__handler__)
@@ -101,7 +112,7 @@ class __Request__(ABC):
         this.__requests__ = self.__requests__
         return this
 
-    def __deepcopy__(self, memo: dict):
+    def __deepcopy__(self, memo: dict) -> Self:
         this = self.__class__.__new__(self.__class__)
         memo[id(self)] = this
         this.__handler__ = deepcopy(self.__handler__, memo)
@@ -116,7 +127,7 @@ class __Request__(ABC):
         return this
 
     @classmethod
-    def __clean_params__(cls, params: Union[adict, Dict[str, Any]]) -> Union[adict, Dict[str, Any]]:
+    def __clean_params__(cls, params: Union[adict, dict[str, Any]]) -> Union[adict, dict[str, Any]]:
         if "url" in params:
             raise ValueError("url is a reserved parameter name")
 
@@ -131,9 +142,11 @@ class __Request__(ABC):
 
 class Request(__Request__):
 
+    __Request__ = __Request__
+
     __path__: str
 
-    def __init__(self, parent: __Request__, path: str):
+    def __init__(self, parent: RequestT, path: str):
         super().__init__(parent)
 
         if self.__handler__.APPEND_SLASH and not path.endswith("/"):
@@ -142,15 +155,15 @@ class Request(__Request__):
         self.__path__ = path
 
     @property
-    def __url__(self):
+    def __url__(self) -> str:
         return urljoin(self.__parent__.__url__ + "/", self.__path__)
 
-    def __copy__(self):
-        this = super().__copy__()
+    def __copy__(self) -> Self:
+        this: Self = super().__copy__()
         this.__path__ = self.__path__
         return this
 
-    def __deepcopy__(self, memo: dict):
-        this = super().__deepcopy__(memo)
+    def __deepcopy__(self, memo: dict) -> Self:
+        this: Self = super().__deepcopy__(memo)
         this.__path__ = self.__path__
         return this
