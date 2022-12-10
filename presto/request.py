@@ -37,7 +37,7 @@ class Request(ABC):
             def __init__(self, hand: HandlerT, requ: RequestT):
                 self.__handler = hand
                 self.__request = requ
-                self._raise_for_status()
+                self.raise_for_status()
 
             @property
             def handler(self) -> HandlerT:
@@ -51,7 +51,7 @@ class Request(ABC):
                 return self._RAISE_FOR_STATUS and status_code not in self._RAISE_EXCEPT_FOR
 
             @abstractmethod
-            def _raise_for_status(self):
+            def raise_for_status(self):
                 raise NotImplementedError
 
             @property
@@ -68,6 +68,7 @@ class Request(ABC):
 
     def __init__(
             self,
+            *,
             parent: Optional[RequestT],
             path: Optional[str] = None,
             APPEND_SLASH: Optional[bool] = None,

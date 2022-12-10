@@ -8,11 +8,13 @@ from presto.handler import Handler
 
 __all__ = "Presto",
 
-PrestoT: TypeAlias = TypeVar("PrestoT", bound="Presto")
+ClientT: TypeAlias = TypeVar("ClientT", bound="Client")
 
 
 # noinspection PyPep8Naming
 class Presto(Request):
+
+    Client: ClientT
 
     class Request(Request):
         class Handler(Handler):
@@ -28,8 +30,8 @@ class Presto(Request):
 
     def __init__(
             self,
-            url: str,
             *,
+            url: str,
             RequestType: Optional[Type[Request]] = None,
             APPEND_SLASH: Optional[bool] = None,
             **kwds
@@ -74,15 +76,36 @@ class Presto(Request):
     options = property(lambda self: self.request(method="OPTIONS"))
     head = property(lambda self: self.request(method="HEAD"))
 
-    class Client:
-        """Very simple base class for Presto client API implementations."""
 
-        P: PrestoT
+class Client:
+    """Very simple base class for Presto client API implementations."""
 
-        # noinspection PyPep8Naming
-        def __init__(self, presto: PrestoT):
-            self.P = presto
+    P: Presto
 
-        @property
-        def url(self):
-            return self.P.__url__
+    class Request(Presto.Request):
+        class Handler(Presto.Request.Handler):
+            class Response(Presto.Request.Handler.Response):
+                _RAISE_EXCEPT_FOR = {404}
+
+    # noinspection PyPep8Naming
+    def __init__(
+            self,
+            *,
+            url: str,
+            PrestoType: Optional[Type[Presto]] = None,
+            RequestType: Optional[Type[Request]] = None,
+            APPEND_SLASH: Optional[bool] = None,
+            **kwds
+    ):
+        self.P = (PrestoType or Presto)(
+            url=url,
+            RequestType=RequestType or self.Request,
+            APPEND_SLASH=APPEND_SLASH,
+        )
+
+    @property
+    def url(self):
+        return self.P.__url__
+
+
+Presto.Client = Client

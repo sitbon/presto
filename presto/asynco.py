@@ -10,7 +10,6 @@ AsyncPrestoT: TypeAlias = TypeVar("AsyncPrestoT", bound="AsyncPresto")
 HandlerT: TypeAlias = TypeVar("HandlerT", bound="AsyncPresto.Request.Handler")
 
 
-# noinspection PyPep8Naming
 class AsyncPresto(Presto):
 
     class Request(Presto.Request):
@@ -38,7 +37,12 @@ class AsyncPresto(Presto):
 
             return super().__call__(**kwds)
 
+    def __call__(self, url: Optional[str] = None, **kwds) -> Self:
+        if url is None and not kwds:
+            raise RuntimeError("Use async method by awaiting .A directly.")
+
+        return super().__call__(url=url, **kwds)
+
     class Client(Presto.Client):
-        # noinspection PyPep8Naming
         def __init__(self, presto: AsyncPrestoT):
             super().__init__(presto)

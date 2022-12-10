@@ -31,12 +31,9 @@ class Handler(Request.Handler):
                     self.__attr = adict(self.json())
             return self.__attr
 
-        def _raise_for_status(self):
+        def raise_for_status(self):
             if self._should_raise_for_status(self.status_code):
-                self.raise_for_status()
-
-    async def A(self, requ: Request) -> Response:
-        return self.__call__(requ)
+                super().raise_for_status()
 
     @classmethod
     def __request__(cls, requ: Request) -> tuple[str, str, dict[str, Any]]:
@@ -56,9 +53,6 @@ class Handler(Request.Handler):
                 **rreq
             )
         )
-
-    def call(self, requ: Request) -> Response:
-        return Handler.__call__(self, requ)
 
     @property
     def session(self) -> requests.Session:
