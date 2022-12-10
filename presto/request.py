@@ -60,6 +60,9 @@ class Request(ABC):
             def attr(self) -> adict:
                 raise NotImplementedError
 
+            def __call__(self) -> adict:
+                return self.attr
+
         @abstractmethod
         def __call__(self, requ: RequestT) -> Response:
             raise NotImplementedError
