@@ -32,7 +32,7 @@ It provides a simple way to create a REST API client that is object-oriented and
 ### Example:
 
 ```python
-from presto.presto import Presto
+from presto import Presto
 import pprint
 
 presto = Presto("https://api.github.com")
@@ -102,7 +102,7 @@ and parent parameters while using the same component path and parameters.
 For example:
 
 ```python
-from presto.presto import Presto
+from presto import Presto
 
 presto = Presto("http://127.0.0.1:8000", APPEND_SLASH=True)
 
@@ -148,11 +148,11 @@ See the example below.
 
 ```python
 import asyncio
-from presto.asynco import AsyncPresto
+from presto.asynco import AsyncPresto as Presto
 
 
 async def main():
-    presto = AsyncPresto("http://127.0.0.1:8000", APPEND_SLASH=True)
+    presto = Presto("http://127.0.0.1:8000", APPEND_SLASH=True)
 
     print("presto:", presto)
 
