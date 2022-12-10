@@ -85,7 +85,7 @@ class Client:
     class Request(Presto.Request):
         class Handler(Presto.Request.Handler):
             class Response(Presto.Request.Handler.Response):
-                _RAISE_EXCEPT_FOR = {404}
+                RAISE_EXCEPT_FOR = {404}
 
     # noinspection PyPep8Naming
     def __init__(

@@ -28,8 +28,8 @@ class Request(ABC):
     # noinspection PyPep8Naming
     class Handler(ABC):
         class Response(ABC):
-            _RAISE_FOR_STATUS: bool = True
-            _RAISE_EXCEPT_FOR: Container = set()
+            RAISE_FOR_STATUS: bool = True
+            RAISE_EXCEPT_FOR: Container = set()
 
             __handler: HandlerT
             __request: RequestT
@@ -48,7 +48,7 @@ class Request(ABC):
                 return self.__request
 
             def _should_raise_for_status(self, status_code: int) -> bool:
-                return self._RAISE_FOR_STATUS and status_code not in self._RAISE_EXCEPT_FOR
+                return self.RAISE_FOR_STATUS and status_code not in self.RAISE_EXCEPT_FOR
 
             @abstractmethod
             def raise_for_status(self):
