@@ -16,6 +16,7 @@ HandlerT: TypeAlias = TypeVar("HandlerT", bound="Request.Handler")
 class Request(ABC):
     """"""
     APPEND_SLASH: bool = False
+    APPEND_SLASH_INHERIT: bool = True
 
     __parent: Optional[RequestT] = None
     __handler: HandlerT = None
@@ -88,7 +89,10 @@ class Request(ABC):
 
         self.__handler = self.Request.Handler()
 
-        self.APPEND_SLASH = APPEND_SLASH if APPEND_SLASH is not None else self.APPEND_SLASH
+        self.APPEND_SLASH = APPEND_SLASH if APPEND_SLASH is not None else (
+            self.APPEND_SLASH if not self.APPEND_SLASH_INHERIT else (parent or self).APPEND_SLASH
+        )
+
         self.__path__ = path
 
         self.__params = adict(self.__clean_params__(getattr(self, "__params__", {})))
@@ -171,11 +175,7 @@ class Request(ABC):
             raise AttributeError(name)  # Most likely an accidentally invalid internal attribute/method access.
 
         if (request := self.__requests.get(name)) is None:
-            request = self.__requests[name] = self.Request(
-                parent=self,
-                path=name,
-                APPEND_SLASH=self.APPEND_SLASH
-            )
+            request = self.__requests[name] = self.Request(parent=self, path=name)
 
         elif request.__parent is not self:
             req = copy(request)
