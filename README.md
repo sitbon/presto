@@ -123,9 +123,9 @@ print("response:", resp)
 print("note:", resp.attr)
 ```
 ```shell
-presto: Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json')))
-api: Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json')))
-api.note: Request(url='http://127.0.0.1:8000/api/note/', params=adict(method='GET', headers=adict(Accept='application/json', X-User='Testing'))) equal: True
+presto: Presto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers={'Accept': 'application/json'}))
+api: Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers={'Accept': 'application/json'}))
+api.note: Request(url='http://127.0.0.1:8000/api/note/', params=adict(method='GET', headers={'Accept': 'application/json', 'X-User': 'Testing'})) equal: True
 headers: {'User-Agent': 'python-requests/2.28.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'X-User': 'Testing'}
 response: <Response [200]>
 note: adict(user='', id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection={'id': 3, 'url': 'http://127.0.0.1:8000/api/note/coll/3/', 'name': 'Public', 'public': True, 'notes': 1})
@@ -174,9 +174,9 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 ```shell
-presto: AsyncPresto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers=adict(Accept='application/json')))
-api: AsyncRequest(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers=adict(Accept='application/json')))
-api.note: AsyncRequest(url='http://127.0.0.1:8000/api/note/', params=adict(method='GET', headers=adict(Accept='application/json', X-User='Testing'))) equal: True
+presto: AsyncPresto(url='http://127.0.0.1:8000/', params=adict(method='GET', headers={'Accept': 'application/json'}))
+api: Request(url='http://127.0.0.1:8000/api/', params=adict(method='GET', headers={'Accept': 'application/json'}))
+api.note: Request(url='http://127.0.0.1:8000/api/note/', params=adict(method='GET', headers={'Accept': 'application/json', 'X-User': 'Testing'})) equal: True
 headers: Headers({'host': '127.0.0.1:8000', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.23.1', 'accept': 'application/json', 'x-user': 'Testing'})
 response: <Response [200 OK]>
 note: adict(user='', id=4, url='http://127.0.0.1:8000/api/note/4/', time='2022-12-02T19:26:09-0800', note='Hello from the API!!', collection={'id': 3, 'url': 'http://127.0.0.1:8000/api/note/coll/3/', 'name': 'Public', 'public': True, 'notes': 1})
