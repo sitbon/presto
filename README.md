@@ -87,7 +87,8 @@ Each dot in the path of the request is a new request object.
 Calling the object without any arguments will execute the request and return the response object.
 
 Indexing the object like a list is a convient way to extend the path to a new object for things
-like id paths, e.g. `presto.note[1]()`.
+like id paths, e.g. `presto("http://<base>").note[1]` maps to a request for `http://<base>/note/1`
+and calling that object executes the request.
 
 Specifying keyword arguments will add them to the request as keyword arguments to requests.request(),
 and then return the current object for further chaining.

@@ -101,6 +101,7 @@ class Client:
             url=url,
             RequestType=RequestType or self.Request,
             APPEND_SLASH=APPEND_SLASH,
+            **kwds,
         )
 
     @property

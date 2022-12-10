@@ -1,4 +1,4 @@
-from typing import Self, Any, TypeVar, Optional, TypeAlias, Container
+from typing import Self, Any, TypeVar, Optional, TypeAlias, Container, Type
 from abc import ABC, abstractmethod
 
 from copy import deepcopy, copy
@@ -23,7 +23,7 @@ class Request(ABC):
     __params: adict
     __requests: dict[str, RequestT]
 
-    Request: RequestT = NotImplemented
+    Request: Type[RequestT] = NotImplemented
 
     # noinspection PyPep8Naming
     class Handler(ABC):
@@ -163,7 +163,7 @@ class Request(ABC):
     async def A(self):
         return await self.__handler.A(self)
 
-    def __getitem__(self, item) -> Self:
+    def __getitem__(self, item: Any) -> Self:
         return self.__getattr__(str(item))
 
     def __getattr__(self, name: str) -> Self:

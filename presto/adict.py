@@ -34,4 +34,3 @@ class adict(AttrDict):
             super().__delitem__(key)
 
         return self
-
