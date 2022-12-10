@@ -40,15 +40,5 @@ class AsyncPresto(Presto):
 
     class Client(Presto.Client):
         # noinspection PyPep8Naming
-        def __init__(
-                self,
-                url: str,
-                *,
-                PrestoType: Optional[Type[AsyncPrestoT]] = None,
-                **kwds
-        ):
-            super().__init__(
-                url=url,
-                PrestoType=PrestoType or AsyncPresto,
-                **kwds
-            )
+        def __init__(self, presto: AsyncPrestoT):
+            super().__init__(presto)

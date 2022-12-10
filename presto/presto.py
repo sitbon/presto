@@ -1,6 +1,6 @@
 from typing import Optional, Type, Self, TypeAlias, TypeVar
 
-from copy import deepcopy
+from copy import copy, deepcopy
 
 from presto.adict import adict
 from presto.request import Request
@@ -19,7 +19,7 @@ class Presto(Request):
             class Response(Handler.Response):
                 ...
 
-    __params__: dict = dict(
+    __params__: adict = adict(
         method="GET",
         headers=dict(
             Accept="application/json",
@@ -70,36 +70,14 @@ class Presto(Request):
     head = property(lambda self: self.request(method="HEAD"))
 
     class Client:
-        """Base class for Presto client API implementations."""
+        """Very simple base class for Presto client API implementations."""
 
-        _presto: PrestoT
-
-        _params: adict | dict = dict(
-            method="GET",
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-            },
-        )
+        P: PrestoT
 
         # noinspection PyPep8Naming
-        def __init__(
-                self,
-                url: str,
-                *,
-                PrestoType: Optional[Type[PrestoT]] = None,
-                **kwds
-        ):
-            params = adict.__merged__(self._params, kwds) if kwds else adict(self._params)
-
-            presto_t = PrestoType or Presto
-
-            self._presto = presto_t(
-                url=url,
-                RequestType=presto_t.Request,
-                **params,
-            )
+        def __init__(self, presto: PrestoT):
+            self.P = presto
 
         @property
         def url(self):
-            return self._presto.__url__
+            return self.P.__url__
