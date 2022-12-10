@@ -1,4 +1,4 @@
-from typing import TypeAlias, TypeVar, Self
+from typing import TypeAlias, TypeVar, Self, Any
 
 from attrdict import AttrDict
 
@@ -25,7 +25,7 @@ class adict(AttrDict):
         this = adict(self) if isinstance(self, adict) else dict(self)
         return adict.__merge__(this, other)
 
-    def __delitem__(self: Self, key: str) -> Self:
+    def __delitem__(self: Self, key: Any) -> Self:
 
         for key, val in tuple(self.items()):
             if isinstance(val, (adict, dict)):

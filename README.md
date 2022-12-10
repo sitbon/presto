@@ -104,7 +104,8 @@ For example:
 ```python
 from presto import Presto
 
-presto = Presto("http://127.0.0.1:8000", APPEND_SLASH=True)
+
+presto = Presto(url="http://127.0.0.1:8000", APPEND_SLASH=True)
 
 print("presto:", presto)
 
@@ -152,7 +153,7 @@ from presto.asynco import AsyncPresto as Presto
 
 
 async def main():
-    presto = Presto("http://127.0.0.1:8000", APPEND_SLASH=True)
+    presto = Presto(url="http://127.0.0.1:8000", APPEND_SLASH=True)
 
     print("presto:", presto)
 
