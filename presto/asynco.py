@@ -6,11 +6,13 @@ from presto.presto import Presto
 
 __all__ = "AsyncPresto",
 
-AsyncPrestoT: TypeAlias = TypeVar("AsyncPrestoT", bound="AsyncPresto")
 HandlerT: TypeAlias = TypeVar("HandlerT", bound="AsyncPresto.Request.Handler")
+ClientT: TypeAlias = TypeVar("ClientT", bound="Client")
 
 
 class AsyncPresto(Presto):
+
+    Client: Type[ClientT]
 
     class Request(Presto.Request):
         class Handler(Presto.Request.Handler):
@@ -22,7 +24,7 @@ class AsyncPresto(Presto):
                     Presto.Request.Handler.Response.__init__(self, hand, requ, resp)
 
             @property
-            def client(self):
+            def client(self) -> httpx.AsyncClient:
                 if self._client is None:
                     self._client = httpx.AsyncClient()
                 return self._client
@@ -33,16 +35,33 @@ class AsyncPresto(Presto):
 
         def __call__(self, **kwds) -> Self:
             if not kwds:
-                raise RuntimeError("Use async method by awaiting .A directly.")
+                return self.A
 
             return super().__call__(**kwds)
 
     def __call__(self, url: Optional[str] = None, **kwds) -> Self:
         if url is None and not kwds:
-            raise RuntimeError("Use async method by awaiting .A directly.")
+            return self.A
 
         return super().__call__(url=url, **kwds)
 
-    class Client(Presto.Client):
-        def __init__(self, presto: AsyncPrestoT):
-            super().__init__(presto)
+
+# noinspection PyPep8Naming
+class Client(AsyncPresto.Client):
+    def __init__(
+            self,
+            *,
+            url: str,
+            RequestType: Optional[Type[AsyncPresto.Request]] = None,
+            APPEND_SLASH: Optional[bool] = None,
+            **kwds
+    ):
+        super().__init__(
+            url=url,
+            RequestType=RequestType or self.Request,
+            APPEND_SLASH=APPEND_SLASH,
+            **kwds
+        )
+
+
+AsyncPresto.Client = Client

@@ -14,7 +14,7 @@ ClientT: TypeAlias = TypeVar("ClientT", bound="Client")
 # noinspection PyPep8Naming
 class Presto(Request):
 
-    Client: ClientT
+    Client: Type[ClientT]
 
     class Request(Request):
         class Handler(Handler):
