@@ -54,6 +54,11 @@ class Presto(Request):
 
     def __call__(self, url: Optional[str] = None, **kwds) -> Self | Request.Handler.Response:
         if url is not None:
+            if not kwds:
+                this = copy(self)
+                this.__path__ = url
+                return this
+
             this = deepcopy(self)
             this.__path__ = url
             this.__merge__(**kwds)
