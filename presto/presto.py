@@ -1,4 +1,4 @@
-from typing import Optional, Type, Self, TypeAlias, TypeVar
+from typing import Optional, Self, Type, TypeAlias
 
 from copy import copy, deepcopy
 
@@ -8,7 +8,7 @@ from presto.handler import Handler
 
 __all__ = "Presto",
 
-ClientT: TypeAlias = TypeVar("ClientT", bound="Client")
+ClientT: TypeAlias = "Client"
 
 
 # noinspection PyPep8Naming

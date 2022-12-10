@@ -1,4 +1,4 @@
-from typing import Self, Any, TypeVar, Optional, TypeAlias, Container, Type
+from typing import Any, Optional, TypeAlias, Container, Self, Type
 from abc import ABC, abstractmethod
 
 from copy import deepcopy, copy
@@ -8,8 +8,8 @@ from presto.adict import adict
 
 __all__ = "Request",
 
-RequestT: TypeAlias = TypeVar("RequestT", bound="Request")
-HandlerT: TypeAlias = TypeVar("HandlerT", bound="Request.Handler")
+RequestT: TypeAlias = "Request"
+HandlerT: TypeAlias = "Request.Handler"
 
 
 # noinspection PyPep8Naming
@@ -18,9 +18,9 @@ class Request(ABC):
     APPEND_SLASH: bool = False
     APPEND_SLASH_INHERIT: bool = True
 
-    __parent: Optional[RequestT] = None
-    __handler: HandlerT = None
-    __path: Optional[str] = None
+    __parent: Optional[RequestT]
+    __handler: HandlerT
+    __path: str
     __params: adict
     __requests: dict[str, RequestT]
 
@@ -74,12 +74,13 @@ class Request(ABC):
             self,
             *,
             parent: Optional[RequestT],
-            path: Optional[str] = None,
+            path: str,
             APPEND_SLASH: Optional[bool] = None,
             **kwds
     ):
+        self.__parent = parent
+
         if parent is not None:
-            self.__parent = parent
 
             if self.Request is NotImplemented:
                 if parent.Request is NotImplemented:
@@ -139,7 +140,7 @@ class Request(ABC):
         return f"{name}({url}{params})"
 
     @property
-    def __path__(self) -> Optional[str]:
+    def __path__(self) -> str:
         return self.__path
 
     @__path__.setter
@@ -202,7 +203,7 @@ class Request(ABC):
         return params
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, Request):
+        if not isinstance(other, self.__class__):
             return False
 
         return self.__url__ == other.__url__ and self.__merged__ == other.__merged__

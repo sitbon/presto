@@ -1,4 +1,4 @@
-from typing import Optional, TypeAlias, TypeVar, Any, Self
+from typing import Any, Optional, Self, TypeAlias
 
 import requests
 
@@ -7,7 +7,7 @@ from presto.request import Request
 
 __all__ = "Handler",
 
-HandlerT: TypeAlias = TypeVar("HandlerT", bound="Handler")
+HandlerT: TypeAlias = "Handler"
 
 
 class Handler(Request.Handler):

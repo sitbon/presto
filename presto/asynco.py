@@ -1,4 +1,4 @@
-from typing import Optional, TypeAlias, TypeVar, Self, Type
+from typing import Optional, TypeAlias, Self, Type
 
 import httpx
 
@@ -6,8 +6,8 @@ from presto.presto import Presto
 
 __all__ = "AsyncPresto",
 
-HandlerT: TypeAlias = TypeVar("HandlerT", bound="AsyncPresto.Request.Handler")
-ClientT: TypeAlias = TypeVar("ClientT", bound="Client")
+HandlerT: TypeAlias = "AsyncPresto.Request.Handler"
+ClientT: TypeAlias = "Client"
 
 
 class AsyncPresto(Presto):
@@ -47,7 +47,7 @@ class AsyncPresto(Presto):
 
 
 # noinspection PyPep8Naming
-class Client(AsyncPresto.Client):
+class Client(Presto.Client):
     def __init__(
             self,
             *,
