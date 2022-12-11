@@ -52,12 +52,14 @@ class Client(Presto.Client):
             self,
             *,
             url: str,
+            PrestoType: Optional[Type[AsyncPresto]] = None,
             RequestType: Optional[Type[AsyncPresto.Request]] = None,
             APPEND_SLASH: Optional[bool] = None,
             **kwds
     ):
         super().__init__(
             url=url,
+            PrestoType=PrestoType or AsyncPresto,
             RequestType=RequestType or self.Request,
             APPEND_SLASH=APPEND_SLASH,
             **kwds
