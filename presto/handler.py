@@ -1,4 +1,4 @@
-from typing import Any, Optional, Self, TypeAlias
+from typing import Any, Self, TypeAlias
 
 import requests
 
@@ -13,10 +13,10 @@ HandlerT: TypeAlias = "Handler"
 class Handler(Request.Handler):
     """Base request handler."""
 
-    __session: Optional[requests.Session] = None
+    __session: requests.Session | None = None
 
     class Response(requests.Response, Request.Handler.Response):
-        __attr: Optional[adict] = None
+        __attr: adict | None = None
 
         def __init__(self, hand: HandlerT, requ: Request, resp: requests.Response):
             self.__dict__ = resp.__dict__

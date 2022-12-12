@@ -1,4 +1,4 @@
-from typing import Optional, Self, Type, TypeAlias
+from typing import Self, Type, TypeAlias
 
 from copy import copy, deepcopy
 
@@ -32,8 +32,8 @@ class Presto(Request):
             self,
             *,
             url: str,
-            RequestType: Optional[Type[Request]] = None,
-            APPEND_SLASH: Optional[bool] = None,
+            RequestType: Type[Request] | None = None,
+            APPEND_SLASH: bool | None = None,
             **kwds
     ):
         self.Request = RequestType or self.Request
@@ -54,7 +54,7 @@ class Presto(Request):
     def request(self) -> Request:
         return super().__getattr__("")
 
-    def __call__(self, url: Optional[str] = None, **kwds) -> Self | Request.Handler.Response:
+    def __call__(self, url: str | None = None, **kwds) -> Self | Request.Handler.Response:
         if url is not None:
             if not kwds:
                 this = copy(self)
@@ -92,9 +92,9 @@ class Client:
             self,
             *,
             url: str,
-            PrestoType: Optional[Type[Presto]] = None,
-            RequestType: Optional[Type[Request]] = None,
-            APPEND_SLASH: Optional[bool] = None,
+            PrestoType: Type[Presto] | None = None,
+            RequestType: Type[Request] | None = None,
+            APPEND_SLASH: bool | None = None,
             **kwds
     ):
         self.P = (PrestoType or Presto)(

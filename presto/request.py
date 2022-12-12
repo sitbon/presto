@@ -75,7 +75,7 @@ class Request(ABC):
             *,
             parent: Optional[RequestT],
             path: str,
-            APPEND_SLASH: Optional[bool] = None,
+            APPEND_SLASH: bool | None = None,
             **kwds
     ):
         self.__parent = parent
@@ -114,7 +114,7 @@ class Request(ABC):
         this.__requests = self.__requests
         return this
 
-    def __deepcopy__(self, memo: Optional[dict[int, Any]]) -> Self:
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
         this: Self = self.__copy__()
         this.__parent = deepcopy(self.__parent, memo)
         this.__handler = deepcopy(self.__handler, memo)

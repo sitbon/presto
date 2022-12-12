@@ -1,4 +1,4 @@
-from typing import Optional, TypeAlias, Self, Type
+from typing import TypeAlias, Self, Type
 
 import httpx
 
@@ -17,7 +17,7 @@ class AsyncPresto(Presto):
     class Request(Presto.Request):
         class Handler(Presto.Request.Handler):
 
-            _client: Optional[httpx.AsyncClient] = None
+            _client: httpx.AsyncClient | None = None
 
             class Response(httpx.Response, Presto.Request.Handler.Response):
                 def __init__(self, hand: HandlerT, requ: Presto.Request, resp: httpx.Response):
@@ -39,7 +39,7 @@ class AsyncPresto(Presto):
 
             return super().__call__(**kwds)
 
-    def __call__(self, url: Optional[str] = None, **kwds) -> Self:
+    def __call__(self, url: str | None = None, **kwds) -> Self:
         if url is None and not kwds:
             return self.A
 
@@ -52,9 +52,9 @@ class Client(Presto.Client):
             self,
             *,
             url: str,
-            PrestoType: Optional[Type[AsyncPresto]] = None,
-            RequestType: Optional[Type[AsyncPresto.Request]] = None,
-            APPEND_SLASH: Optional[bool] = None,
+            PrestoType: Type[AsyncPresto] | None = None,
+            RequestType: Type[AsyncPresto.Request] | None = None,
+            APPEND_SLASH: bool | None = None,
             **kwds
     ):
         super().__init__(
