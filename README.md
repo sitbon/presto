@@ -37,11 +37,11 @@ import pprint
 
 presto = Presto("https://api.github.com")
 
-user = presto.users.sitbon()  # == presto.users["sitbon"]()
+user = presto.users.sitbon()()  # == presto.users["sitbon"]().attr
 
-print(f"User {user.attr.login} has {user.attr.public_repos} public repositories.")
+print(f"User {user.login} has {user.public_repos} public repositories.")
 
-pprint.pprint(user.json())
+pprint.pprint(dict(user))
 ```
 ```shell
 User sitbon has 15 public repositories.
@@ -82,25 +82,29 @@ User sitbon has 15 public repositories.
 
 ### Usage:
 
-Each dot in the path of the request is a new request object.
+Adding to a request path is as simple as accessing an attribute of the same name
+from a `Presto` instance. For example, `Presto("http://example.com").some_path`
+maps to a request object that defines a GET request to `http://example.com/some_path`.
 
-Calling the object without any arguments will execute the request and return the response object.
+Parameters such as headers are set by calling dotted objects under `Presto`, e.g. `presto.some_path(x=y)`.
+
+These parameters are eventually passed to requests.request() as keyword arguments, but only
+at a later time when the request is executed by calling the object without any arguments.
+
+The return value from a parameter-setting call is the object itself, to enable further chaining.
+Thus, request parameters can be set and inherited by further dotted paths.
 
 Indexing the object like a list is a convient way to extend the path to a new object for things
-like id paths, e.g. `presto("http://<base>").note[1]` maps to a request for `http://<base>/note/1`
+like id paths, e.g. `Presto("http://<base>").note[1]` maps to a request for `http://<base>/note/1`
 and calling that object executes the request.
 
-Specifying keyword arguments will add them to the request as keyword arguments to requests.request(),
-and then return the current object for further chaining.
+There are a few special top-level attributes that can be used to modify the request without
+needing to call the object and set the `method=` parameter:
+`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`, and finally `R` which is
+a request object with no path and no parameters set.
 
-There are a few special top-level attributes that can be used to modify the request:
-`get`, `post`, `put`, `patch`, `delete`, `head`, `options`, and finally `request` which is
-an empty path component that can be used to indirectly modify existing top-level auto created request objects.
 
-All of these top-level attributes are able to clone existing request attributes, to modify the path
-and parent parameters while using the same component path and parameters.
-
-For example:
+#### Example:
 
 ```python
 from presto import Presto

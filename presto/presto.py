@@ -30,8 +30,8 @@ class Presto(Request):
 
     def __init__(
             self,
-            *,
             url: str,
+            *,
             RequestType: Type[Request] | None = None,
             APPEND_SLASH: bool | None = None,
             **kwds
@@ -51,7 +51,7 @@ class Presto(Request):
         return this
 
     @property
-    def request(self) -> Request:
+    def R(self) -> Request:
         return super().__getattr__("")
 
     def __call__(self, url: str | None = None, **kwds) -> Self | Request.Handler.Response:
@@ -68,13 +68,13 @@ class Presto(Request):
 
         return super().__call__(**kwds)
 
-    get = property(lambda self: self.request(method="GET"))
-    post = property(lambda self: self.request(method="POST"))
-    put = property(lambda self: self.request(method="PUT"))
-    patch = property(lambda self: self.request(method="PATCH"))
-    delete = property(lambda self: self.request(method="DELETE"))
-    options = property(lambda self: self.request(method="OPTIONS"))
-    head = property(lambda self: self.request(method="HEAD"))
+    GET = property(lambda self: self.request(method="GET"))
+    POST = property(lambda self: self.request(method="POST"))
+    PUT = property(lambda self: self.request(method="PUT"))
+    PATCH = property(lambda self: self.request(method="PATCH"))
+    DELETE = property(lambda self: self.request(method="DELETE"))
+    OPTIONS = property(lambda self: self.request(method="OPTIONS"))
+    HEAD = property(lambda self: self.request(method="HEAD"))
 
 
 class Client:
