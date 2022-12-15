@@ -81,15 +81,7 @@ class Request(ABC):
         self.__parent = parent
 
         if parent is not None:
-
-            if self.Request is NotImplemented:
-                if parent.Request is NotImplemented:
-                    raise TypeError("Request.Request must be defined for parent.")
-
-                self.Request = parent.Request
-        else:
-            if self.Request is NotImplemented:
-                raise TypeError("Request.Request must be defined for subclass.")
+            self.Request = parent.Request
 
         self.__handler = self.Request.Handler()
 
@@ -207,3 +199,6 @@ class Request(ABC):
             return False
 
         return self.__url__ == other.__url__ and self.__merged__ == other.__merged__
+
+
+Request.Request = Request

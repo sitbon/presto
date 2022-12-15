@@ -14,7 +14,7 @@ ClientT: TypeAlias = "Client"
 # noinspection PyPep8Naming
 class Presto(Request):
 
-    Client: Type[ClientT]
+    Client: Type[ClientT] = NotImplemented
 
     class Request(Request):
         class Handler(Handler):
