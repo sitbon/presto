@@ -68,13 +68,13 @@ class Presto(Request):
 
         return super().__call__(**kwds)
 
-    GET = property(lambda self: self.request(method="GET"))
-    POST = property(lambda self: self.request(method="POST"))
-    PUT = property(lambda self: self.request(method="PUT"))
-    PATCH = property(lambda self: self.request(method="PATCH"))
-    DELETE = property(lambda self: self.request(method="DELETE"))
-    OPTIONS = property(lambda self: self.request(method="OPTIONS"))
-    HEAD = property(lambda self: self.request(method="HEAD"))
+    GET: Self = property(lambda self: super().__call__(method="GET"))
+    POST: Self = property(lambda self: super().__call__(method="POST"))
+    PUT: Self = property(lambda self: super().__call__(method="PUT"))
+    PATCH: Self = property(lambda self: super().__call__(method="PATCH"))
+    DELETE: Self = property(lambda self: super().__call__(method="DELETE"))
+    OPTIONS: Self = property(lambda self: super().__call__(method="OPTIONS"))
+    HEAD: Self = property(lambda self: super().__call__(method="HEAD"))
 
 
 class Client:
