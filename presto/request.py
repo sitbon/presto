@@ -1,4 +1,4 @@
-from typing import Any, Optional, TypeAlias, Container, Self, Type
+from typing import Any, Optional, TypeAlias, Self, Type
 from abc import ABC, abstractmethod
 
 from copy import deepcopy, copy
@@ -30,7 +30,7 @@ class Request(ABC):
     class Handler(ABC):
         class Response(ABC):
             RAISE_FOR_STATUS: bool = True
-            RAISE_EXCEPT_FOR: Container = set()
+            RAISE_EXCEPT_FOR: set[int] = set()
 
             __handler: HandlerT
             __request: RequestT
