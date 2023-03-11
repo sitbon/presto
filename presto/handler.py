@@ -16,7 +16,7 @@ class Handler(Request.Handler):
     __session: requests.Session | None = None
 
     class Response(requests.Response, Request.Handler.Response):
-        __attr: adict | None = None
+        __attr: Any = None
 
         def __init__(self, hand: HandlerT, requ: Request, resp: requests.Response):
             self.__dict__ = resp.__dict__
@@ -25,10 +25,10 @@ class Handler(Request.Handler):
 
         @property
         def attr(self):
-            if self.__attr is None:
-                if self.status_code == 200 and \
-                        self.headers.get("content-type").startswith("application/json"):
-                    self.__attr = adict(self.json())
+            if self.__attr is None and self.status_code == 200 and \
+                    "application/json" in self.headers.get("content-type").lower():
+                self.__attr = adict.__from_json__(self.json())
+
             return self.__attr
 
         def raise_for_status(self):
