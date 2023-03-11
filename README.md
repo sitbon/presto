@@ -35,9 +35,9 @@ It provides a simple way to create a REST API client that is object-oriented and
 from presto import Presto
 import pprint
 
-presto = Presto("https://api.github.com")
+github = Presto("https://api.github.com")
 
-user = presto.users.sitbon()()  # == presto.users["sitbon"]().attr
+user = github.users.sitbon()()  # == github.users["sitbon"]().attr
 
 print(f"User {user.login} has {user.public_repos} public repositories.")
 
